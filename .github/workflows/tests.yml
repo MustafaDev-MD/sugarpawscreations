@@ -69,6 +69,13 @@ jobs:
           sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
 
       - name: Generate Key
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: root
         run: php artisan key:generate
 
       - name: Debug Environment
@@ -82,10 +89,6 @@ jobs:
           php artisan tinker --execute="dump(config('database.connections.mysql.host'));"
           php artisan tinker --execute="dump(env('DB_HOST'));"
 
-      - name: Clear Config Cache
-        run: |
-          php artisan optimize:clear
-
       - name: Debug DB Config
         run: |
           php artisan tinker --execute="dump(config('database.default'));"
@@ -95,6 +98,17 @@ jobs:
         run: |
           sleep 20
           mysql -h127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
+
+      - name: Debug DB
+        run: |
+          php artisan about | grep Database || true
+
+          php artisan tinker --execute="
+          dump(env('DB_HOST'));
+          dump(env('DB_DATABASE'));
+          dump(env('DB_USERNAME'));
+          dump(env('DB_PASSWORD'));
+          "
 
       - name: Run Migrations
         env:
