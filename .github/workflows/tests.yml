@@ -71,6 +71,17 @@ jobs:
       - name: Generate Key
         run: php artisan key:generate
 
+      - name: Debug Environment
+        run: |
+          echo "===== .env ====="
+          grep DB_ .env || true
+
+          echo ""
+          echo "===== Laravel Config ====="
+          php artisan tinker --execute="dump(config('database.default'));"
+          php artisan tinker --execute="dump(config('database.connections.mysql.host'));"
+          php artisan tinker --execute="dump(env('DB_HOST'));"
+
       - name: Clear Config Cache
         run: |
           php artisan optimize:clear
