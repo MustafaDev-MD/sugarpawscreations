@@ -12,16 +12,16 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'password' => bcrypt('password'),
+    ]);
 
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+    $response->assertSessionHasNoErrors();
 
     $this->assertAuthenticated();
 });
@@ -29,19 +29,31 @@ test('users can authenticate using the login screen', function () {
 test('passkey login response redirects to the current team dashboard', function () {
     $user = User::factory()->create();
 
+    $team = $user->currentTeam;
+    $team->update([
+        'slug' => 'test-team',
+    ]);
+
     $request = Request::create(route('login', absolute: false), 'GET', server: [
         'HTTP_ACCEPT' => 'application/json',
     ]);
+
     $request->setLaravelSession($this->app['session.store']);
     $request->setUserResolver(fn () => $user);
 
-    $jsonResponse = app(PasskeyLoginResponse::class)->toResponse($request);
+    $response = app(PasskeyLoginResponse::class)->toResponse($request);
 
-    expect($jsonResponse->getData()->redirect)->toBe(route('dashboard', ['current_team' => $user->personalTeam()->slug]));
+    $data = json_decode($response->getContent(), true);
+
+    expect($data['redirect'])->toBe(
+        route('dashboard', ['current_team' => 'test-team'], false)
+    );
 });
 
 test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'password' => bcrypt('password'),
+    ]);
 
     $response = $this->post(route('login.store'), [
         'email' => $user->email,

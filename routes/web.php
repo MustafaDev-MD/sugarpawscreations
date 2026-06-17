@@ -15,10 +15,6 @@ use App\Livewire\Admin\Portfolios;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/dashboard', function () {
-    view('welcome');
-})->name('dashboard');
-
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
