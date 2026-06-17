@@ -12,12 +12,12 @@ class Categories extends Component
 {
     use WithFileUploads;
 
-    public $name = '';
+    public string $name = '';
     public $image;
-    public $categoryId;
+    public ?int $categoryId;
     public $editMode = false;
 
-    protected $rules = [
+    protected array $rules = [
         'name'  => 'required|string|min:2|max:255',
         'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
     ];
@@ -37,7 +37,7 @@ class Categories extends Component
         ]);
     }
 
-    public function save()
+    public function save(): void
     {
         $this->validate();
 
@@ -61,7 +61,7 @@ class Categories extends Component
         );
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $category = Category::findOrFail($id);
 

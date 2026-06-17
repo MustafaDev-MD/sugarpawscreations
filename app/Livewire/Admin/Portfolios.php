@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\Portfolio;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class Portfolios extends Component
 {
@@ -72,7 +73,7 @@ class Portfolios extends Component
         Portfolio::create([
             'category_id'  => $this->category_id,
             'title'        => $this->title,
-            'before_image' => $this->before_image ? $this->before_image->store('portfolios', 'public') : null,
+            'before_image' => $this->before_image ? $this->before_image?->store('portfolios', 'public') : null,
             'after_image'  => $this->after_image  ? $this->after_image->store('portfolios', 'public')  : null,
         ]);
 
@@ -181,7 +182,7 @@ class Portfolios extends Component
     //         'categories' => Category::latest()->get(),
     //     ]);
     // }
-    public function render()
+    public function render(): View
     {
         $query = Portfolio::with('category')->latest();
 

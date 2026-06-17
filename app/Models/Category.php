@@ -5,8 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
-use App\Models\Portfolio;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string $image
+ */
 class Category extends Model
 {
     protected $fillable = [
@@ -15,6 +20,9 @@ class Category extends Model
         'image'
     ];
 
+    /**
+     * @return HasMany<Portfolio>
+     */
     public function portfolios(): HasMany
     {
         return $this->hasMany(Portfolio::class);
@@ -24,12 +32,12 @@ class Category extends Model
     {
         parent::boot();
 
-        static::creating(function ($category) {
-        $category->slug = Str::slug($category->name);
-    });
+        static::creating(function ($category): void {
+            $category->slug = Str::slug($category->name);
+        });
 
-    static::updating(function ($category) {
-        $category->slug = Str::slug($category->name);
-    });
+        static::updating(function ($category): void {
+            $category->slug = Str::slug($category->name);
+        });
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
@@ -82,7 +83,7 @@ class CategoryController extends Controller
     //     ));
     // }
 
-    public function show(Category $category, Request $request)
+    public function show(Category $category, Request $request): View
     {
         // URL se value pakdein, default 12
         $perPage = $request->input('per_page', 12);
@@ -97,7 +98,7 @@ class CategoryController extends Controller
         // Pagination links me per_page query string lock rakhne ke liye
         $portfolios->appends(['per_page' => $perPage]);
 
-        $baItems = $portfolios->map(fn($p) => [
+        $baItems = $portfolios->getCollection()->map(fn($p) => [
             'before' => asset('storage/' . $p->before_image),
             'after'  => asset('storage/' . $p->after_image),
         ])->values();
