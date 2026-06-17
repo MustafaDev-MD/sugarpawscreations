@@ -55,20 +55,18 @@ jobs:
       - name: Copy Environment File
         run: cp .env.example .env
 
-      # ✅ IMPORTANT: FORCE SAFE TEST ENV
       - name: Configure Environment (FIXED)
         run: |
-          echo "APP_ENV=testing" >> .env
-          echo "APP_DEBUG=true" >> .env
+          cp .env.example .env
 
+          echo "APP_ENV=testing" >> .env
           echo "DB_CONNECTION=mysql" >> .env
-          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_HOST=mysql" >> .env
           echo "DB_PORT=3306" >> .env
           echo "DB_DATABASE=testing" >> .env
           echo "DB_USERNAME=root" >> .env
           echo "DB_PASSWORD=root" >> .env
 
-          # ❌ CRITICAL FIX (NO DATABASE DRIVERS IN CI)
           echo "CACHE_STORE=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
@@ -88,6 +86,12 @@ jobs:
           done
           exit 1
 
+      - name: Clear config cache
+        run: php artisan config:clear
+
+      - name: Force config reload
+        run: php artisan optimize:clear
+
       - name: Run Migrations
         run: php artisan migrate:fresh --force
 
@@ -97,5 +101,5 @@ jobs:
       - name: Run PHPStan
         run: composer types:check
 
-      # - name: Run Tests
-      #   run: php artisan test
+      - name: Run Tests
+        run: php artisan test
