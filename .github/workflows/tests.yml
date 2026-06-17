@@ -40,11 +40,13 @@ jobs:
         php-version: ['8.4']
 
     steps:
+      # ---------------- Checkout ----------------
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
+      # ---------------- PHP Setup ----------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -52,53 +54,73 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      # ---------------- Node Setup ----------------
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # ---------------- Install Node deps ----------------
       - name: Install Node Dependencies
-        run: npm ci
+        run: npm ci --no-audit --no-fund
 
+      # ---------------- Composer ----------------
       - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # ---------------- ENV Setup ----------------
       - name: Copy Environment File
         run: cp .env.example .env
 
       - name: Configure Environment
         run: |
           echo "APP_ENV=testing" >> .env
+          echo "APP_KEY=" >> .env
+
           echo "DB_CONNECTION=mysql" >> .env
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=3306" >> .env
           echo "DB_DATABASE=testing" >> .env
           echo "DB_USERNAME=root" >> .env
           echo "DB_PASSWORD=root" >> .env
+
           echo "SESSION_DRIVER=array" >> .env
           echo "CACHE_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
 
+      # ---------------- Clear Cache (CRITICAL FIX) ----------------
+      - name: Clear Laravel Cache
+        run: |
+          php artisan optimize:clear
+          php artisan config:clear
+          php artisan cache:clear
+
+      # ---------------- App Key ----------------
       - name: Generate Application Key
         run: php artisan key:generate
 
+      # ---------------- Wait MySQL ----------------
       - name: Wait for MySQL
         run: |
-          for i in {1..30}; do
-            mysqladmin ping -h 127.0.0.1 -uroot -proot && exit 0
+          for i in {1..40}; do
+            mysqladmin ping -h 127.0.0.1 -uroot -proot && echo "MySQL Ready" && exit 0
             echo "Waiting for MySQL..."
             sleep 2
           done
           exit 1
 
+      # ---------------- Migrations ----------------
       - name: Run Migrations
         run: php artisan migrate:fresh --force
 
+      # ---------------- Build Assets ----------------
       - name: Build Assets
         run: npm run build
 
+      # ---------------- Type Check ----------------
       - name: Run Type Analysis
         run: composer types:check
 
+      # ---------------- Run Tests ----------------
       - name: Run Tests
         run: php artisan test
