@@ -156,11 +156,21 @@
 
         </div> -->
 
+        <!-- <div class="owl-carousel owl-mousewheel nav-rounded"
+            data-items="5"
+            data-margin="6"
+            data-nav="true"
+            data-dots="false"> -->
+
         <div class="owl-carousel owl-mousewheel nav-rounded"
             data-items="5"
             data-margin="6"
             data-nav="true"
-            data-dots="false">
+            data-dots="false"
+            data-tablet-landscape="3"
+            data-tablet-portrait="2"
+            data-mobile-landscape="1"
+            data-mobile-portrait="1">
 
             @foreach($categories as $category)
 
