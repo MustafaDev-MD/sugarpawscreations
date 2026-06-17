@@ -52,12 +52,15 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Copy .env
+      - name: Copy Environment File
         run: cp .env.example .env
 
-      - name: Configure Environment
+      # ✅ IMPORTANT: FORCE SAFE TEST ENV
+      - name: Configure Environment (FIXED)
         run: |
           echo "APP_ENV=testing" >> .env
+          echo "APP_DEBUG=true" >> .env
+
           echo "DB_CONNECTION=mysql" >> .env
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=3306" >> .env
@@ -65,29 +68,34 @@ jobs:
           echo "DB_USERNAME=root" >> .env
           echo "DB_PASSWORD=root" >> .env
 
+          # ❌ CRITICAL FIX (NO DATABASE DRIVERS IN CI)
           echo "CACHE_STORE=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
 
-      - name: Generate key
+      - name: Generate Application Key
         run: php artisan key:generate
+
+      - name: Clear Config Cache
+        run: php artisan config:clear
 
       - name: Wait for MySQL
         run: |
           for i in {1..30}; do
             mysqladmin ping -h 127.0.0.1 -uroot -proot && exit 0
+            echo "Waiting for MySQL..."
             sleep 2
           done
           exit 1
 
-      - name: Run migrations
-        run: php artisan migrate --force
+      - name: Run Migrations
+        run: php artisan migrate:fresh --force
 
-      - name: Build assets
+      - name: Build Assets
         run: npm run build
 
       - name: Run PHPStan
         run: composer types:check
 
-      - name: Run tests
+      - name: Run Tests
         run: php artisan test
