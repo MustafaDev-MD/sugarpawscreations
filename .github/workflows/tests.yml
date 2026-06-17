@@ -3,58 +3,107 @@ name: tests
 on:
   push:
     branches:
-      - develop
       - main
       - master
+      - develop
       - workos
+
   pull_request:
     branches:
-      - develop
       - main
       - master
+      - develop
       - workos
 
+permissions:
+  contents: read
+
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
-    environment: Testing
-    strategy:
-      matrix:
-        php-version: ['8.4', '8.5']
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
-          tools: composer:v2
-          coverage: xdebug
+          php-version: 8.4
+          extensions: pdo_mysql, mbstring, bcmath
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: 24
 
-      - name: Install Node Dependencies
-        run: npm i
+      - name: Install Composer Dependencies
+        run: composer install --prefer-dist --no-interaction
 
-      - name: Add Flux Credentials Loaded From ENV
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
+      - name: Install NPM Dependencies
+        run: npm ci
 
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Create Environment
+        run: |
+          cp .env.example .env
 
-      - name: Copy Environment File
-        run: cp .env.example .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=testing/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
 
-      - name: Generate Application Key
+      - name: Generate Key
         run: php artisan key:generate
+
+      - name: Clear Config Cache
+        run: |
+          php artisan optimize:clear
+
+      - name: Debug DB Config
+        run: |
+          php artisan tinker --execute="dump(config('database.default'));"
+          php artisan tinker --execute="dump(config('database.connections.mysql.host'));"
+
+      - name: Wait For MySQL
+        run: |
+          sleep 20
+          mysql -h127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
+
+      - name: Run Migrations
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate:fresh --force
 
       - name: Build Assets
         run: npm run build
 
       - name: Run Tests
-        run: ./vendor/bin/pest
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test
