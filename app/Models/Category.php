@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string $image
+ * @property string|null $image
  */
 class Category extends Model
 {
@@ -21,14 +21,14 @@ class Category extends Model
     ];
 
     /**
-     * @return HasMany<Portfolio>
+     * @return HasMany<Portfolio, $this>
      */
     public function portfolios(): HasMany
     {
         return $this->hasMany(Portfolio::class);
     }
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 

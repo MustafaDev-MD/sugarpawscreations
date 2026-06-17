@@ -2,38 +2,49 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Component;
-use Livewire\WithFileUploads;
 use App\Models\Category;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 
 class Categories extends Component
 {
     use WithFileUploads;
 
     public string $name = '';
-    public $image;
-    public ?int $categoryId;
-    public $editMode = false;
 
+    public ?TemporaryUploadedFile $image = null;
+
+    public ?int $categoryId = null;
+
+    public bool $editMode = false;
+
+    /**
+     * @var array<string, string>
+     */
     protected array $rules = [
         'name'  => 'required|string|min:2|max:255',
         'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
     ];
 
-    protected $messages = [
+    /**
+     * @var array<string, string>
+     */
+    protected array $messages = [
         'name.required' => 'Category name is required.',
         'image.image'   => 'Please upload a valid image.',
     ];
 
-    public function resetInput()
+    public function resetInput(): void
     {
         $this->reset([
             'name',
             'image',
             'categoryId',
-            'editMode'
+            'editMode',
         ]);
     }
 
@@ -41,11 +52,7 @@ class Categories extends Component
     {
         $this->validate();
 
-        $imagePath = null;
-
-        if ($this->image) {
-            $imagePath = $this->image->store('categories', 'public');
-        }
+        $imagePath = $this->image?->store('categories', 'public');
 
         Category::create([
             'name'  => $this->name,
@@ -55,10 +62,7 @@ class Categories extends Component
 
         $this->resetInput();
 
-        $this->dispatch(
-            'success',
-            message: 'Category Added Successfully'
-        );
+        $this->dispatch('success', message: 'Category Added Successfully');
     }
 
     public function edit(int $id): void
@@ -71,17 +75,19 @@ class Categories extends Component
         $this->editMode = true;
     }
 
-    public function update()
+    public function update(): void
     {
         $this->validate();
+
+        if (!$this->categoryId) {
+            return;
+        }
 
         $category = Category::findOrFail($this->categoryId);
 
         $imagePath = $category->image;
 
-        if ($this->image) {
-
-            // old image delete
+        if ($this->image instanceof TemporaryUploadedFile) {
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
             }
@@ -97,13 +103,10 @@ class Categories extends Component
 
         $this->resetInput();
 
-        $this->dispatch(
-            'success',
-            message: 'Category Updated Successfully'
-        );
+        $this->dispatch('success', message: 'Category Updated Successfully');
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
         try {
             $category = Category::findOrFail($id);
@@ -115,20 +118,20 @@ class Categories extends Component
             $category->delete();
 
             $this->dispatch('success', message: 'Category Deleted Successfully');
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             $this->dispatch('error', message: 'Failed to delete category');
         }
     }
 
-    public function cancelEdit()
+    public function cancelEdit(): void
     {
         $this->resetInput();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.admin.categories', [
-            'categories' => Category::latest()->get()
+            'categories' => Category::latest()->get(),
         ]);
     }
 }

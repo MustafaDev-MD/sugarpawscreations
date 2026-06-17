@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $category_id
- * @property string $title
- * @property string $before_image
- * @property string $after_image
+ * @property string|null $title
+ * @property string|null $before_image
+ * @property string|null $after_image
  */
 class Portfolio extends Model
 {
@@ -22,7 +22,7 @@ class Portfolio extends Model
     ];
 
     /**
-     * @return BelongsTo<Category, Portfolio>
+     * @return BelongsTo<Category, $this>
      */
     public function category(): BelongsTo
     {
