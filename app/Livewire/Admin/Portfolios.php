@@ -58,6 +58,13 @@ class Portfolios extends Component
         ];
     }
 
+    private function generateFilename(TemporaryUploadedFile $file): string
+    {
+        $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $ext  = $file->getClientOriginalExtension();
+        return $name . '_' . time() . '.' . $ext;
+    }
+
     public function resetInput(): void
     {
         $this->reset([
@@ -84,10 +91,14 @@ class Portfolios extends Component
         $this->validate();
 
         Portfolio::create([
-            'category_id' => $this->category_id,
-            'title' => $this->title,
-            'before_image' => $this->before_image?->store('portfolios', 'public'),
-            'after_image' => $this->after_image?->store('portfolios', 'public'),
+            'category_id'  => $this->category_id,
+            'title'        => $this->title,
+            'before_image' => $this->before_image
+                ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'public')
+                : null,
+            'after_image'  => $this->after_image
+                ? $this->after_image->storeAs('portfolios', $this->generateFilename($this->after_image), 'public')
+                : null,
         ]);
 
         $this->resetInput();
@@ -108,31 +119,30 @@ class Portfolios extends Component
             $after = $this->bulk_after_images[$i] ?? null;
 
             Portfolio::create([
-                'category_id' => $this->bulk_category_id,
-                'title' => '',
-                'before_image' => $before->store('portfolios', 'public'),
-                'after_image' => $after?->store('portfolios', 'public'),
+                'category_id'  => $this->bulk_category_id,
+                'title'        => '',
+                'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
+                'after_image'  => $after
+                    ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
+                    : null,
             ]);
         }
 
         $this->resetBulk();
 
-        $this->dispatch(
-            'success',
-            message: 'Bulk portfolios uploaded successfully'
-        );
+        $this->dispatch('success', message: 'Bulk portfolios uploaded successfully');
     }
 
     public function edit(int $id): void
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        $this->portfolioId = $portfolio->id;
-        $this->title = $portfolio->title;
-        $this->category_id = $portfolio->category_id;
+        $this->portfolioId  = $portfolio->id;
+        $this->title        = $portfolio->title;
+        $this->category_id  = $portfolio->category_id;
 
         $this->before_image = null;
-        $this->after_image = null;
+        $this->after_image  = null;
 
         $this->editMode = true;
     }
@@ -149,7 +159,7 @@ class Portfolios extends Component
 
         $data = [
             'category_id' => $this->category_id,
-            'title' => $this->title,
+            'title'       => $this->title,
         ];
 
         if ($this->before_image instanceof TemporaryUploadedFile) {
@@ -157,7 +167,11 @@ class Portfolios extends Component
                 Storage::disk('public')->delete($portfolio->before_image);
             }
 
-            $data['before_image'] = $this->before_image->store('portfolios', 'public');
+            $data['before_image'] = $this->before_image->storeAs(
+                'portfolios',
+                $this->generateFilename($this->before_image),
+                'public'
+            );
         }
 
         if ($this->after_image instanceof TemporaryUploadedFile) {
@@ -165,7 +179,11 @@ class Portfolios extends Component
                 Storage::disk('public')->delete($portfolio->after_image);
             }
 
-            $data['after_image'] = $this->after_image->store('portfolios', 'public');
+            $data['after_image'] = $this->after_image->storeAs(
+                'portfolios',
+                $this->generateFilename($this->after_image),
+                'public'
+            );
         }
 
         $portfolio->update($data);

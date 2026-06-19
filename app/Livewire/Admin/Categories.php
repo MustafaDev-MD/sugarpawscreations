@@ -48,11 +48,20 @@ class Categories extends Component
         ]);
     }
 
+    private function generateFilename(TemporaryUploadedFile $file): string
+    {
+        $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $ext  = $file->getClientOriginalExtension();
+        return $name . '_' . time() . '.' . $ext;
+    }
+
     public function save(): void
     {
         $this->validate();
 
-        $imagePath = $this->image?->store('categories', 'public');
+        $imagePath = $this->image
+            ? $this->image->storeAs('categories', $this->generateFilename($this->image), 'public')
+            : null;
 
         Category::create([
             'name'  => $this->name,
@@ -92,7 +101,7 @@ class Categories extends Component
                 Storage::disk('public')->delete($category->image);
             }
 
-            $imagePath = $this->image->store('categories', 'public');
+            $imagePath = $this->image->storeAs('categories', $this->generateFilename($this->image), 'public');
         }
 
         $category->update([
