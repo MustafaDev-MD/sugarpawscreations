@@ -2,18 +2,9 @@ name: tests
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - develop
-      - workos
-
+    branches: [main, master, develop, workos]
   pull_request:
-    branches:
-      - main
-      - master
-      - develop
-      - workos
+    branches: [main, master, develop, workos]
 
 permissions:
   contents: read
@@ -58,80 +49,25 @@ jobs:
         run: npm ci
 
       - name: Create Environment
-        run: |
-          cp .env.example .env
+        run: cp .env.testing .env
 
-          echo "APP_ENV=testing" >> .env
-          echo "APP_KEY=base64:SomeRandom32CharacterLongKeyHere123456789=" >> .env
-
-          echo "DB_CONNECTION=mysql" >> .env
-          echo "DB_HOST=127.0.0.1" >> .env
-          echo "DB_PORT=3306" >> .env
-          echo "DB_DATABASE=testing" >> .env
-          echo "DB_USERNAME=root" >> .env
-          echo "DB_PASSWORD=root" >> .env
-
-      - name: Generate Key
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: testing
-          DB_USERNAME: root
-          DB_PASSWORD: root
+      - name: Generate App Key
         run: php artisan key:generate
 
-      - name: Debug Environment
-        run: |
-          echo "===== .env ====="
-          grep DB_ .env || true
-
-          echo ""
-          echo "===== Laravel Config ====="
-          php artisan tinker --execute="dump(config('database.default'));"
-          php artisan tinker --execute="dump(config('database.connections.mysql.host'));"
-          php artisan tinker --execute="dump(env('DB_HOST'));"
-
-      - name: Debug DB Config
-        run: |
-          php artisan tinker --execute="dump(config('database.default'));"
-          php artisan tinker --execute="dump(config('database.connections.mysql.host'));"
-
-      - name: Wait For MySQL
-        run: |
-          sleep 20
-          mysql -h127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
-
-      - name: Debug DB
-        run: |
-          php artisan about | grep Database || true
-
-          php artisan tinker --execute="
-          dump(env('DB_HOST'));
-          dump(env('DB_DATABASE'));
-          dump(env('DB_USERNAME'));
-          dump(env('DB_PASSWORD'));
-          "
-
       - name: Run Migrations
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: testing
-          DB_USERNAME: root
-          DB_PASSWORD: root
         run: php artisan migrate:fresh --force
 
       - name: Build Assets
         run: npm run build
 
       - name: Run Tests
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: testing
-          DB_USERNAME: root
-          DB_PASSWORD: root
         run: php artisan test
+
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: root
+      DB_PASSWORD: root
