@@ -41,25 +41,25 @@ class UserFactory extends Factory
     /**
      * Configure the model factory.
      */
-    // public function configure(): static
-    // {
-    //     return $this->afterCreating(function ($user) {
-    //         $team = Team::factory()->personal()->create([
-    //             'name' => $user->name . "'s Team",
-    //         ]);
-
-    //         $team->members()->attach($user, [
-    //             'role' => TeamRole::Owner->value,
-    //         ]);
-
-    //         $user->switchTeam($team);
-    //     });
-    // }
-
     public function configure(): static
     {
-        return $this;
+        return $this->afterCreating(function ($user) {
+            $team = Team::factory()->personal()->create([
+                'name' => $user->name . "'s Team",
+            ]);
+
+            $team->members()->attach($user, [
+                'role' => TeamRole::Owner->value,
+            ]);
+
+            $user->switchTeam($team);
+        });
     }
+
+    // public function configure(): static
+    // {
+    //     return $this;
+    // }
 
     /**
      * Indicate that the model's email address should be unverified.
