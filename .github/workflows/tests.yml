@@ -2,9 +2,18 @@ name: tests
 
 on:
   push:
-    branches: [main, master, develop, workos]
+    branches:
+      - main
+      - master
+      - develop
+      - workos
+
   pull_request:
-    branches: [main, master, develop, workos]
+    branches:
+      - main
+      - master
+      - develop
+      - workos
 
 permissions:
   contents: read
@@ -12,6 +21,16 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      APP_KEY: ${{ secrets.APP_KEY }}
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: root
+      DB_PASSWORD: root
 
     services:
       mysql:
@@ -49,10 +68,7 @@ jobs:
         run: npm ci
 
       - name: Create Environment
-        run: cp .env.testing .env
-
-      - name: Generate App Key
-        run: php artisan key:generate
+        run: cp .env.example .env
 
       - name: Run Migrations
         run: php artisan migrate:fresh --force
@@ -62,12 +78,3 @@ jobs:
 
       - name: Run Tests
         run: php artisan test
-
-    env:
-      APP_ENV: testing
-      DB_CONNECTION: mysql
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_DATABASE: testing
-      DB_USERNAME: root
-      DB_PASSWORD: root
