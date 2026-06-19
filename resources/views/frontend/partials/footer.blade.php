@@ -6,7 +6,7 @@
 
                 <div class="col-sm-6">
                     <div class="copyright">
-                        &copy; Sugar Paws Creations / All rights reserved
+                        &copy; Sugarpaws Creations / All rights reserved
                     </div>
                 </div> <!-- /.col -->
 

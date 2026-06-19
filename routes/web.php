@@ -51,4 +51,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/portfolios', Portfolios::class)->name('portfolios');
 });
 
+Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/admin-test', function () {
+        return 'Admin Access Granted';
+    });
+
+    Route::view('/admin/register-user', 'admin.register-user');
+
+});
+
 require __DIR__ . '/settings.php';

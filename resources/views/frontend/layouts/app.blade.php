@@ -37,6 +37,7 @@
   <!-- Template master CSS -->
   <link rel="stylesheet" href="{{ asset('assets/css/twentytwenty.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
+  <!-- <link rel="stylesheet" href="{{ asset('assets/css/dark-style.css') }}"> -->
   <link rel="stylesheet" href="{{ asset('assets/css/helper.css') }}">
 
   <!-- Template dark style CSS (comment or uncomment below line to enable/disable template dark style) -->
@@ -96,6 +97,92 @@
     <span class="ba-modal-next" onclick="changeBeforeAfter(1)"><i class="fa-solid fa-chevron-right"></i></span>
 
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+      const themeToggle = document.getElementById('theme-toggle');
+      if (!themeToggle) return;
+
+      const moonSvg = themeToggle.querySelector('.moon-svg');
+      const sunSvg = themeToggle.querySelector('.sun-svg');
+      const darkLogo = document.querySelector('.logo-dark');
+      const lightLogo = document.querySelector('.logo-light');
+
+      let darkStyleLink = document.getElementById('dark-style-css');
+
+      function showMoon() {
+        if (moonSvg) moonSvg.style.display = 'block';
+        if (sunSvg) sunSvg.style.display = 'none';
+      }
+
+      function showSun() {
+        if (moonSvg) moonSvg.style.display = 'none';
+        if (sunSvg) sunSvg.style.display = 'block';
+      }
+
+      function updateTheme(theme, animate = false) {
+
+        if (theme === 'dark') {
+
+          document.documentElement.setAttribute('data-theme', 'dark');
+
+          if (!darkStyleLink) {
+            darkStyleLink = document.createElement('link');
+            darkStyleLink.rel = 'stylesheet';
+            darkStyleLink.id = 'dark-style-css';
+            darkStyleLink.href = '{{ asset("assets/css/dark-style.css") }}';
+            document.head.appendChild(darkStyleLink);
+          }
+
+          themeToggle.classList.remove('light-mode');
+
+          if (animate) {
+            setTimeout(showMoon, 150);
+          } else {
+            showMoon();
+          }
+
+          if (darkLogo) darkLogo.style.display = 'none';
+          if (lightLogo) lightLogo.style.display = 'block';
+
+        } else {
+
+          document.documentElement.removeAttribute('data-theme');
+
+          if (darkStyleLink) {
+            darkStyleLink.remove();
+            darkStyleLink = null;
+          }
+
+          themeToggle.classList.add('light-mode');
+
+          if (animate) {
+            setTimeout(showSun, 150);
+          } else {
+            showSun();
+          }
+
+          if (darkLogo) darkLogo.style.display = 'block';
+          if (lightLogo) lightLogo.style.display = 'none';
+        }
+
+        localStorage.setItem('theme', theme);
+      }
+
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      updateTheme(savedTheme, false);
+
+      themeToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        updateTheme(newTheme, true);
+      });
+
+    });
+  </script>
+
   <script>
     // Saare before/after items ka array
     var baItems = [];
@@ -243,7 +330,6 @@
         }, 100);
       });
     });
-
   </script>
 
   <!-- Scroll to top button -->
