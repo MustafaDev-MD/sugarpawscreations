@@ -40,21 +40,33 @@ class Portfolios extends Component
     public string $selectedCategory = 'all';
 
     /**
+     * Rules for the single create/update form.
+     *
      * @return array<string, mixed>
      */
-    protected function rules(): array
+    protected function singleRules(): array
     {
         return [
-            'title' => 'nullable|string|max:255',
-            'category_id' => 'required|exists:categories,id',
+            'title'        => 'nullable|string|max:255',
+            'category_id'  => 'required|exists:categories,id',
             'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'after_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'after_image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ];
+    }
 
-            'bulk_category_id' => 'required|exists:categories,id',
-            'bulk_before_images' => 'required|array|min:1',
-            'bulk_before_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-            'bulk_after_images' => 'required|array|min:1',
-            'bulk_after_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+    /**
+     * Rules for the bulk upload form.
+     *
+     * @return array<string, mixed>
+     */
+    protected function bulkRules(): array
+    {
+        return [
+            'bulk_category_id'      => 'required|exists:categories,id',
+            'bulk_before_images'    => 'required|array|min:1',
+            'bulk_before_images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            'bulk_after_images'     => 'required|array|min:1',
+            'bulk_after_images.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
         ];
     }
 
@@ -75,6 +87,8 @@ class Portfolios extends Component
             'portfolioId',
             'editMode',
         ]);
+
+        $this->resetErrorBag();
     }
 
     public function resetBulk(): void
@@ -84,11 +98,13 @@ class Portfolios extends Component
             'bulk_before_images',
             'bulk_after_images',
         ]);
+
+        $this->resetErrorBag();
     }
 
     public function save(): void
     {
-        $this->validate();
+        $this->validate($this->singleRules());
 
         Portfolio::create([
             'category_id'  => $this->category_id,
@@ -108,7 +124,7 @@ class Portfolios extends Component
 
     public function saveBulk(): void
     {
-        $this->validate();
+        $this->validate($this->bulkRules());
 
         if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
             $this->dispatch('error', message: 'Before/After images count must match');
@@ -149,7 +165,7 @@ class Portfolios extends Component
 
     public function update(): void
     {
-        $this->validate();
+        $this->validate($this->singleRules());
 
         if (!$this->portfolioId) {
             return;
