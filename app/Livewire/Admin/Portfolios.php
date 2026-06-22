@@ -161,6 +161,8 @@ class Portfolios extends Component
         $this->after_image  = null;
 
         $this->editMode = true;
+
+        $this->dispatch('edit-mode-activated');
     }
 
     public function update(): void

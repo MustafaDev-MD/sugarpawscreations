@@ -35,7 +35,13 @@
                 this.afterPreview = null;
             }
         }"
+        
         x-on:reset-previews.window="resetPreviews()"
+        x-on:edit-mode-activated.window="
+        beforePreview = null;
+        afterPreview = null;
+        $el.scrollIntoView({ behavior: 'smooth', block: 'start' });"
+
         class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30">
 
         {{-- Form mode indicator --}}

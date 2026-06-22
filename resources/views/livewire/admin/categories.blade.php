@@ -45,6 +45,9 @@
                 this.imagePreview = null;
             }
         }"
+        x-on:edit-mode-activated.window="
+        imagePreview = null;
+        $el.scrollIntoView({ behavior: 'smooth', block: 'start' });"
         class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30">
 
         <div class="flex items-center gap-2">
@@ -311,16 +314,19 @@
             width: auto;
             min-width: 280px;
         }
+
         #toast-container>.toast-success {
             background-image: none !important;
             border: 1px solid rgba(16, 185, 129, 0.4);
             color: #6ee7b7 !important;
         }
+
         #toast-container>.toast-error {
             background-image: none !important;
             border: 1px solid rgba(244, 63, 94, 0.4);
             color: #fda4af !important;
         }
+
         #toast-container>div::before {
             font-family: "Font Awesome 5 Free", sans-serif;
             font-weight: 900;
@@ -330,12 +336,38 @@
             transform: translateY(-50%);
             font-size: 18px;
         }
-        #toast-container>.toast-success::before { content: "✓"; color: #34d399; }
-        #toast-container>.toast-error::before { content: "✕"; color: #fb7185; }
-        .toast-progress { opacity: 0.6; }
-        #toast-container>.toast-success .toast-progress { background-color: #34d399; }
-        #toast-container>.toast-error .toast-progress { background-color: #fb7185; }
-        #toast-container .toast-message { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
-        #toast-container .toast-close-button { color: #d4d4d8; opacity: 0.7; }
+
+        #toast-container>.toast-success::before {
+            content: "✓";
+            color: #34d399;
+        }
+
+        #toast-container>.toast-error::before {
+            content: "✕";
+            color: #fb7185;
+        }
+
+        .toast-progress {
+            opacity: 0.6;
+        }
+
+        #toast-container>.toast-success .toast-progress {
+            background-color: #34d399;
+        }
+
+        #toast-container>.toast-error .toast-progress {
+            background-color: #fb7185;
+        }
+
+        #toast-container .toast-message {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        #toast-container .toast-close-button {
+            color: #d4d4d8;
+            opacity: 0.7;
+        }
     </style>
 </div>
