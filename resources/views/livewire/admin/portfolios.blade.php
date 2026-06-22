@@ -98,7 +98,8 @@
                         @if($before_image)
                         <div class="flex flex-col items-center gap-2 pointer-events-none">
                             <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                <img src="{{ $before_image->temporaryUrl() }}" class="w-full h-full object-cover" alt="before preview">
+                                <!-- <img src="{{ $before_image->temporaryUrl() }}" class="w-full h-full object-cover" alt="before preview"> -->
+                                <img src="{{ method_exists($before_image, 'temporaryUrl') ? $before_image->temporaryUrl() : '' }}" class="w-full h-full object-cover" alt="before preview">
                             </div>
                             <span class="text-[10px] text-fuchsia-300/80 font-bold uppercase tracking-widest">Click to replace</span>
                         </div>
