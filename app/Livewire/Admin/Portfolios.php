@@ -16,9 +16,11 @@ class Portfolios extends Component
     use WithFileUploads;
     use WithPagination;
 
-    protected string $paginationTheme = 'tailwind';
+    protected $paginationTheme = 'tailwind';
 
     public ?Portfolio $currentPortfolio = null;
+
+    public int $perPage = 10;
 
     // Single upload
     public string $title = '';
@@ -160,7 +162,7 @@ class Portfolios extends Component
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        $this->currentPortfolio = $portfolio;
+        $portfolio = $this->currentPortfolio;
 
         $this->portfolioId  = $portfolio->id;
         $this->title        = $portfolio->title;
@@ -236,7 +238,9 @@ class Portfolios extends Component
             $portfolio->delete();
 
             $this->dispatch('success', message: 'Portfolio Deleted Successfully');
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            logger()->error($e->getMessage());
+
             $this->dispatch('error', message: 'Failed to delete portfolio');
         }
     }
@@ -248,21 +252,26 @@ class Portfolios extends Component
         $this->resetPage();
     }
 
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function render(): View
     {
         // $query = Portfolio::with('category')->latest();
 
         $query = Portfolio::query()
-        ->with('category')
-        ->latest();
+            ->with(['category:id,name'])
+            ->latest();
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);
         }
 
         return view('livewire.admin.portfolios', [
-            'portfolios' => $query->paginate(12),
-            'categories' => Category::latest()->get(),
+            'portfolios' => $query->paginate($this->perPage),
+            'categories' => Category::select('id', 'name')->latest()->get(),
         ]);
     }
 }

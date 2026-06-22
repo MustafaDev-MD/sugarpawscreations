@@ -496,6 +496,64 @@
             {{ $category->name }}
         </button>
         @endforeach
+
+    </div>
+
+    <div class="flex justify-between items-center">
+
+        <div
+            x-data="{ open:false }"
+            class="relative w-44">
+    
+            <button
+                @click="open=!open"
+                type="button"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-500/40 text-white text-sm font-semibold backdrop-blur-xl cursor-pointer">
+    
+                <span>{{ $perPage }} Items</span>
+    
+                <svg class="w-4 h-4 text-violet-300">
+                    <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                </svg>
+            </button>
+    
+            <div
+                x-show="open"
+                @click.away="open=false"
+                x-transition
+                class="absolute z-50 mt-2 w-full rounded-xl bg-zinc-900/95 backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl">
+    
+                @foreach([5,10,15,25,50] as $size)
+                <button
+                    @click="open=false"
+                    wire:click="$set('perPage', {{ $size }})"
+                    class="w-full text-left px-4 py-3 text-sm transition-all cursor-pointer
+                    {{ $perPage == $size
+                        ? 'bg-fuchsia-500/20 text-fuchsia-300'
+                        : 'text-slate-300 hover:bg-white/5' }}">
+                    {{ $size }} Items
+                </button>
+                @endforeach
+    
+            </div>
+        </div>
+    
+        <div class="text-sm text-slate-400">
+            Showing
+            <span class="text-fuchsia-300 font-semibold">
+                {{ $portfolios->firstItem() ?? 0 }}
+            </span>
+            -
+            <span class="text-fuchsia-300 font-semibold">
+                {{ $portfolios->lastItem() ?? 0 }}
+            </span>
+            of
+            <span class="text-violet-300 font-semibold">
+                {{ $portfolios->total() }}
+            </span>
+            portfolios
+        </div>
+
     </div>
 
     {{-- CARDS LIST --}}
@@ -579,9 +637,10 @@
             </div>
         </div>
         @endforelse
+
         @if($portfolios->hasPages())
-        <div class="col-span-full mt-8">
-            {{ $portfolios->links() }}
+        <div class="col-span-full mt-8 cursor-pointer">
+            {{ $portfolios->links(data: ['scrollTo' => false]) }}
         </div>
         @endif
 

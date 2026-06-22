@@ -16,7 +16,7 @@ class Categories extends Component
     use WithFileUploads;
     use WithPagination;
 
-    protected string $paginationTheme = 'tailwind';
+    protected $paginationTheme = 'tailwind';
 
     public string $name = '';
 
@@ -27,6 +27,8 @@ class Categories extends Component
     public ?int $categoryId = null;
 
     public bool $editMode = false;
+
+    public int $perPage = 5;
 
     /**
      * @var array<string, string>
@@ -149,10 +151,15 @@ class Categories extends Component
         $this->resetInput();
     }
 
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
+
     public function render(): View
     {
         return view('livewire.admin.categories', [
-            'categories' => Category::latest()->paginate(12),
+            'categories' => Category::latest()->paginate($this->perPage),
         ]);
     }
 }
