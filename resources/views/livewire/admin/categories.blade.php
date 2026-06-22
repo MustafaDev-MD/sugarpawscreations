@@ -15,13 +15,6 @@
                 Create, edit, and organize your system categories with a fluid glassmorphic interface.
             </p>
         </div>
-        <!-- <div class="self-start sm:self-center px-4 py-1.5 text-xs font-semibold bg-white/5 rounded-full border border-white/10 text-violet-300 shadow-lg shadow-violet-900/20 backdrop-blur-md flex items-center gap-2">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            Livewire Engine Active
-        </div> -->
     </div>
 
     {{-- SUCCESS / FLASH MESSAGE --}}
@@ -38,7 +31,20 @@
     @endif
 
     {{-- FORM SECTION --}}
-    <div x-data="{ isDragging: false }"
+    <div
+        x-data="{
+            isDragging: false,
+            imagePreview: null,
+            readFile(file) {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => { this.imagePreview = e.target.result; };
+                reader.readAsDataURL(file);
+            },
+            resetPreview() {
+                this.imagePreview = null;
+            }
+        }"
         class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30">
 
         <div class="flex items-center gap-2">
@@ -53,7 +59,7 @@
 
         <div class="grid grid-cols-1 gap-6">
 
-            {{-- NAME (full width) --}}
+            {{-- NAME --}}
             <div class="space-y-2 w-full flex flex-col">
                 <label class="text-[11px] font-bold text-violet-300/80 uppercase tracking-wider pl-1">Category Name</label>
                 <input
@@ -66,7 +72,7 @@
                 @enderror
             </div>
 
-            {{-- IMAGE UPLOAD (full width, big dropzone) --}}
+            {{-- IMAGE UPLOAD --}}
             <div class="space-y-2 w-full flex flex-col">
                 <label class="text-[11px] font-bold text-fuchsia-300/80 uppercase tracking-wider pl-1">Upload Image</label>
 
@@ -81,6 +87,7 @@
                             dt.items.add(file);
                             $refs.fileInput.files = dt.files;
                             $refs.fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            readFile(file);
                         }
                     "
                     :class="isDragging ? 'border-fuchsia-500/80 bg-fuchsia-500/[0.06] scale-[1.01]' : 'border-white/15 hover:border-fuchsia-500/50 hover:bg-white/[0.02]'"
@@ -91,46 +98,48 @@
                         type="file"
                         wire:model="image"
                         accept="image/*"
+                        @change="readFile($event.target.files[0])"
                         class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
 
-                    @if($image)
-                    {{-- PREVIEW STATE --}}
-                    <div class="flex flex-col items-center gap-3 pointer-events-none">
-                        <div class="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 bg-black/50 shadow-lg shadow-black/40">
-                            <img src="{{ $image->temporaryUrl() }}" class="w-full h-full object-cover" alt="preview">
+                    {{-- Alpine preview: new file selected --}}
+                    <template x-if="imagePreview">
+                        <div class="flex flex-col items-center gap-3 pointer-events-none">
+                            <div class="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 bg-black/50 shadow-lg shadow-black/40">
+                                <img :src="imagePreview" class="w-full h-full object-cover" alt="preview">
+                            </div>
+                            <span class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold">Click or drop to replace</span>
                         </div>
-                        <div class="text-xs text-slate-300 font-medium truncate max-w-xs">
-                            {{ $image->getClientOriginalName() }}
+                    </template>
+
+                    {{-- No new file selected --}}
+                    <template x-if="!imagePreview">
+                        @if($editMode && $categoryId && \App\Models\Category::find($categoryId)?->image)
+                        {{-- Edit mode: show existing image --}}
+                        <div class="flex flex-col items-center gap-3 pointer-events-none">
+                            <div class="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 bg-black/50 shadow-lg shadow-black/40">
+                                <img src="{{ asset('storage/'.\App\Models\Category::find($categoryId)->image) }}" class="w-full h-full object-cover" alt="current image">
+                            </div>
+                            <div class="text-xs text-slate-300 font-medium">Current image</div>
+                            <span class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold">Click or drop to replace</span>
                         </div>
-                        <span class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold">Click or drop to replace</span>
-                    </div>
-                    @elseif($editMode && $categoryId && \App\Models\Category::find($categoryId)?->image)
-                    {{-- EXISTING IMAGE (edit mode, no new upload yet) --}}
-                    <div class="flex flex-col items-center gap-3 pointer-events-none">
-                        <div class="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 bg-black/50 shadow-lg shadow-black/40">
-                            <img src="{{ asset('storage/'.\App\Models\Category::find($categoryId)->image) }}" class="w-full h-full object-cover" alt="current image">
+                        @else
+                        {{-- Empty state --}}
+                        <div class="flex flex-col items-center gap-3 pointer-events-none">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                                <svg class="w-7 h-7 text-fuchsia-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
+                                </svg>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-sm font-semibold text-slate-200">
+                                    <span class="text-fuchsia-300">Click to upload</span> or drag and drop
+                                </p>
+                                <p class="text-[11px] text-slate-500">PNG, JPG or WEBP &middot; up to 2MB</p>
+                            </div>
                         </div>
-                        <div class="text-xs text-slate-300 font-medium">
-                            Current image
-                        </div>
-                        <span class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold">Click or drop to replace</span>
-                    </div>
-                    @else
-                    {{-- EMPTY STATE --}}
-                    <div class="flex flex-col items-center gap-3 pointer-events-none">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-fuchsia-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
-                            </svg>
-                        </div>
-                        <div class="space-y-1">
-                            <p class="text-sm font-semibold text-slate-200">
-                                <span class="text-fuchsia-300">Click to upload</span> or drag and drop
-                            </p>
-                            <p class="text-[11px] text-slate-500">PNG, JPG or WEBP &middot; up to 2MB</p>
-                        </div>
-                    </div>
-                    @endif
+                        @endif
+                    </template>
+
                 </div>
 
                 @error('image')
@@ -151,6 +160,7 @@
                 <div class="flex gap-2.5">
                     <button
                         wire:click="update"
+                        @click="resetPreview()"
                         class="flex-1 h-[52px] bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:shadow-[0_8px_25px_-5px_rgba(251,146,60,0.5)] hover:brightness-110 text-slate-950 font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-900/30 active:scale-[0.97] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer btn-press">
                         <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.213 15M12 10v4l3 3" />
@@ -159,6 +169,7 @@
                     </button>
                     <button
                         wire:click="resetInput"
+                        @click="resetPreview()"
                         class="px-6 h-[52px] bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 hover:border-white/20 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer btn-press">
                         Cancel
                     </button>
@@ -166,6 +177,7 @@
                 @else
                 <button
                     wire:click="save"
+                    @click="resetPreview()"
                     class="w-full h-[52px] bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:shadow-[0_8px_25px_-5px_rgba(217,70,239,0.5)] hover:brightness-110 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-fuchsia-900/30 active:scale-[0.97] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer btn-press">
                     <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -216,23 +228,23 @@
                 <button
                     x-data
                     @click.prevent="
-                                        Swal.fire({
-                                            title: 'Are you sure?',
-                                            text: 'This category will be permanently deleted. This action cannot be undone.',
-                                            icon: 'warning',
-                                            showCancelButton: true,
-                                            confirmButtonText: 'Yes, delete it',
-                                            cancelButtonText: 'Cancel',
-                                            confirmButtonColor: '#e11d48',
-                                            cancelButtonColor: '#6b7280',
-                                            background: '#18181b',
-                                            color: '#f4f4f5'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                $wire.delete({{ $cat->id }});
-                                            }
-                                        })
-                                    "
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: 'This category will be permanently deleted. This action cannot be undone.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, delete it',
+                            cancelButtonText: 'Cancel',
+                            confirmButtonColor: '#e11d48',
+                            cancelButtonColor: '#6b7280',
+                            background: '#18181b',
+                            color: '#f4f4f5'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $wire.delete({{ $cat->id }});
+                            }
+                        })
+                    "
                     class="flex-1 py-2.5 bg-gradient-to-b from-rose-500/15 to-rose-500/5 hover:from-rose-500/30 hover:to-rose-500/15 text-rose-300 border border-rose-500/20 hover:border-rose-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm btn-press">
                     <svg class="w-3.5 h-3.5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -251,15 +263,12 @@
         @endforelse
 
     </div>
+
+    {{-- SCRIPTS --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
         document.addEventListener('livewire:init', () => {
@@ -302,19 +311,16 @@
             width: auto;
             min-width: 280px;
         }
-
         #toast-container>.toast-success {
             background-image: none !important;
             border: 1px solid rgba(16, 185, 129, 0.4);
             color: #6ee7b7 !important;
         }
-
         #toast-container>.toast-error {
             background-image: none !important;
             border: 1px solid rgba(244, 63, 94, 0.4);
             color: #fda4af !important;
         }
-
         #toast-container>div::before {
             font-family: "Font Awesome 5 Free", sans-serif;
             font-weight: 900;
@@ -324,38 +330,12 @@
             transform: translateY(-50%);
             font-size: 18px;
         }
-
-        #toast-container>.toast-success::before {
-            content: "✓";
-            color: #34d399;
-        }
-
-        #toast-container>.toast-error::before {
-            content: "✕";
-            color: #fb7185;
-        }
-
-        .toast-progress {
-            opacity: 0.6;
-        }
-
-        #toast-container>.toast-success .toast-progress {
-            background-color: #34d399;
-        }
-
-        #toast-container>.toast-error .toast-progress {
-            background-color: #fb7185;
-        }
-
-        #toast-container .toast-message {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-        }
-
-        #toast-container .toast-close-button {
-            color: #d4d4d8;
-            opacity: 0.7;
-        }
+        #toast-container>.toast-success::before { content: "✓"; color: #34d399; }
+        #toast-container>.toast-error::before { content: "✕"; color: #fb7185; }
+        .toast-progress { opacity: 0.6; }
+        #toast-container>.toast-success .toast-progress { background-color: #34d399; }
+        #toast-container>.toast-error .toast-progress { background-color: #fb7185; }
+        #toast-container .toast-message { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+        #toast-container .toast-close-button { color: #d4d4d8; opacity: 0.7; }
     </style>
 </div>
