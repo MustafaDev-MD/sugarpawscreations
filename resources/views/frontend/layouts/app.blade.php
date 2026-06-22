@@ -15,8 +15,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Favicon (http://www.favicon-generator.org/) -->
-  <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-  <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ asset('assets/img/logo-dark.png') }}" type="image/x-icon">
+  <!-- <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon"> -->
 
   <!-- Google font (https://www.google.com/fonts) -->
   <link href='https://fonts.googleapis.com/css?family=Roboto+Mono:400,300,500,700,100' rel='stylesheet' type='text/css'>
