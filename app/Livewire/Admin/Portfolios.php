@@ -9,10 +9,16 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class Portfolios extends Component
 {
     use WithFileUploads;
+    use WithPagination;
+
+    protected string $paginationTheme = 'tailwind';
+
+    public ?Portfolio $currentPortfolio = null;
 
     // Single upload
     public string $title = '';
@@ -86,6 +92,7 @@ class Portfolios extends Component
             'after_image',
             'portfolioId',
             'editMode',
+            'currentPortfolio',
         ]);
 
         $this->resetErrorBag();
@@ -152,6 +159,8 @@ class Portfolios extends Component
     public function edit(int $id): void
     {
         $portfolio = Portfolio::findOrFail($id);
+
+        $this->currentPortfolio = $portfolio;
 
         $this->portfolioId  = $portfolio->id;
         $this->title        = $portfolio->title;
@@ -235,18 +244,24 @@ class Portfolios extends Component
     public function filterCategory(string|int $categoryId): void
     {
         $this->selectedCategory = (string) $categoryId;
+
+        $this->resetPage();
     }
 
     public function render(): View
     {
-        $query = Portfolio::with('category')->latest();
+        // $query = Portfolio::with('category')->latest();
+
+        $query = Portfolio::query()
+        ->with('category')
+        ->latest();
 
         if ($this->selectedCategory !== 'all') {
             $query->where('category_id', $this->selectedCategory);
         }
 
         return view('livewire.admin.portfolios', [
-            'portfolios' => $query->get(),
+            'portfolios' => $query->paginate(12),
             'categories' => Category::latest()->get(),
         ]);
     }

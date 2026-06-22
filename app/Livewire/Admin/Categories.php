@@ -9,14 +9,20 @@ use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class Categories extends Component
 {
     use WithFileUploads;
+    use WithPagination;
+
+    protected string $paginationTheme = 'tailwind';
 
     public string $name = '';
 
     public ?TemporaryUploadedFile $image = null;
+
+    public ?string $existingImage = null;
 
     public ?int $categoryId = null;
 
@@ -45,6 +51,7 @@ class Categories extends Component
             'image',
             'categoryId',
             'editMode',
+            'existingImage',
         ]);
     }
 
@@ -80,8 +87,13 @@ class Categories extends Component
 
         $this->categoryId = $category->id;
         $this->name = $category->name;
+
+        $this->existingImage = $category->image;
+
         $this->image = null;
         $this->editMode = true;
+
+        $this->dispatch('edit-mode-activated');
     }
 
     public function update(): void
@@ -140,7 +152,7 @@ class Categories extends Component
     public function render(): View
     {
         return view('livewire.admin.categories', [
-            'categories' => Category::latest()->get(),
+            'categories' => Category::latest()->paginate(12),
         ]);
     }
 }

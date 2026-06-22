@@ -116,11 +116,12 @@
 
                     {{-- No new file selected --}}
                     <template x-if="!imagePreview">
-                        @if($editMode && $categoryId && \App\Models\Category::find($categoryId)?->image)
+                        {{-- @if($editMode && $categoryId && \App\Models\Category::find($categoryId)?->image) --}}
+                        @if($editMode && $existingImage)
                         {{-- Edit mode: show existing image --}}
                         <div class="flex flex-col items-center gap-3 pointer-events-none">
                             <div class="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 bg-black/50 shadow-lg shadow-black/40">
-                                <img src="{{ asset('storage/'.\App\Models\Category::find($categoryId)->image) }}" class="w-full h-full object-cover" alt="current image">
+                                <img src="{{ asset('storage/'.$existingImage) }}" class="w-full h-full object-cover" alt="current image">
                             </div>
                             <div class="text-xs text-slate-300 font-medium">Current image</div>
                             <span class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold">Click or drop to replace</span>
@@ -222,7 +223,7 @@
             </div>
 
             <div class="relative z-10 flex gap-2.5 mt-5 pt-3.5 border-t border-white/10 w-full">
-                <button wire:click="edit({{ $cat->id }})" class="flex-1 py-2.5 bg-gradient-to-b from-amber-500/15 to-amber-500/5 hover:from-amber-500/30 hover:to-amber-500/15 text-amber-300 border border-amber-500/20 hover:border-amber-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm btn-press">
+                <button wire:click="edit({{ $cat->id }})" class="flex-1 py-2.5 bg-gradient-to-b from-amber-500/15 to-amber-500/5 hover:from-amber-500/30 hover:to-amber-500/15 text-amber-300 border border-amber-500/20 hover:border-amber-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm btn-press cursor-pointer">
                     <svg class="w-3.5 h-3.5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11 20H8v-3l9.414-9.414z" />
                     </svg>
@@ -248,7 +249,7 @@
                             }
                         })
                     "
-                    class="flex-1 py-2.5 bg-gradient-to-b from-rose-500/15 to-rose-500/5 hover:from-rose-500/30 hover:to-rose-500/15 text-rose-300 border border-rose-500/20 hover:border-rose-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm btn-press">
+                    class="flex-1 py-2.5 bg-gradient-to-b from-rose-500/15 to-rose-500/5 hover:from-rose-500/30 hover:to-rose-500/15 text-rose-300 border border-rose-500/20 hover:border-rose-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm btn-press cursor-pointer">
                     <svg class="w-3.5 h-3.5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -264,6 +265,10 @@
             </div>
         </div>
         @endforelse
+
+        <div class="col-span-full">
+            {{ $categories->links() }}
+        </div>
 
     </div>
 

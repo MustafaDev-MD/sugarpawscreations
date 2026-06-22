@@ -35,14 +35,14 @@
                 this.afterPreview = null;
             }
         }"
-        
+
         x-on:reset-previews.window="resetPreviews()"
         x-on:edit-mode-activated.window="
         beforePreview = null;
         afterPreview = null;
         $el.scrollIntoView({ behavior: 'smooth', block: 'start' });"
 
-        class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30">
+        class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30 cursor-pointer">
 
         {{-- Form mode indicator --}}
         <div class="flex items-center gap-2">
@@ -129,10 +129,14 @@
 
                         {{-- Edit mode: show existing image (only when no new file selected) --}}
                         <template x-if="!beforePreview">
-                            @if($editMode && $portfolioId && \App\Models\Portfolio::find($portfolioId)?->before_image)
+                            @if($editMode && $currentPortfolio?->before_image)
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
                                 <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                    <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->before_image) }}" class="w-full h-full object-cover" alt="current before">
+                                    <!-- <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->before_image) }}" class="w-full h-full object-cover" alt="current before"> -->
+                                    <img
+                                        src="{{ asset('storage/'.$currentPortfolio->before_image) }}"
+                                        class="w-full h-full object-cover"
+                                        alt="current before">
                                 </div>
                                 <span class="text-[10px] text-slate-400">Current Before</span>
                                 <span class="text-[10px] text-fuchsia-300/80 font-bold uppercase tracking-widest">Click to replace</span>
@@ -202,10 +206,14 @@
 
                         {{-- Edit mode: show existing image (only when no new file selected) --}}
                         <template x-if="!afterPreview">
-                            @if($editMode && $portfolioId && \App\Models\Portfolio::find($portfolioId)?->after_image)
+                            @if($editMode && $currentPortfolio?->after_image)
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
                                 <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                    <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->after_image) }}" class="w-full h-full object-cover" alt="current after">
+                                    <!-- <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->after_image) }}" class="w-full h-full object-cover" alt="current after"> -->
+                                    <img
+                                        src="{{ asset('storage/'.$currentPortfolio->after_image) }}"
+                                        class="w-full h-full object-cover"
+                                        alt="current after">
                                 </div>
                                 <span class="text-[10px] text-slate-400">Current After</span>
                                 <span class="text-[10px] text-cyan-300/80 font-bold uppercase tracking-widest">Click to replace</span>
@@ -479,14 +487,14 @@
             All
         </button>
         @foreach($categories as $category)
-            <button
-                wire:click="filterCategory({{ $category->id }})"
-                class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer transform
+        <button
+            wire:click="filterCategory({{ $category->id }})"
+            class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer transform
                 {{ $selectedCategory == $category->id
                     ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30 border border-violet-500'
                     : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-violet-500 hover:text-white hover:border-violet-500 hover:shadow-lg hover:shadow-violet-500/30' }}">
-                {{ $category->name }}
-            </button>
+            {{ $category->name }}
+        </button>
         @endforeach
     </div>
 
@@ -494,7 +502,7 @@
     <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
 
         @forelse($portfolios as $portfolio)
-        <div class="group relative bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-xl hover:bg-white/[0.06] hover:border-violet-500/40 hover:shadow-2xl hover:shadow-violet-950/40 hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between overflow-hidden h-full">
+        <div wire:key="portfolio-{{ $portfolio->id }}" class="group relative bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-xl hover:bg-white/[0.06] hover:border-violet-500/40 hover:shadow-2xl hover:shadow-violet-950/40 hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between overflow-hidden h-full">
 
             <div class="absolute -inset-px bg-gradient-to-br from-violet-500/0 via-transparent to-fuchsia-500/0 group-hover:from-violet-500/15 group-hover:to-fuchsia-500/15 rounded-2xl transition-all duration-500 pointer-events-none"></div>
 
@@ -502,7 +510,7 @@
                 <div class="grid grid-cols-2 gap-1.5">
                     <div class="relative overflow-hidden rounded-xl h-32 bg-black/40 border border-white/5">
                         @if($portfolio->before_image)
-                        <img src="{{ asset('storage/'.$portfolio->before_image) }}"
+                        <img loading="lazy" src="{{ asset('storage/'.$portfolio->before_image) }}"
                             class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
                             alt="before">
                         @endif
@@ -510,7 +518,7 @@
                     </div>
                     <div class="relative overflow-hidden rounded-xl h-32 bg-black/40 border border-white/5">
                         @if($portfolio->after_image)
-                        <img src="{{ asset('storage/'.$portfolio->after_image) }}"
+                        <img loading="lazy" src="{{ asset('storage/'.$portfolio->after_image) }}"
                             class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
                             alt="after">
                         @endif
@@ -528,7 +536,7 @@
 
             <div class="relative z-10 flex gap-2.5 mt-5 pt-3.5 border-t border-white/10 w-full">
                 <button wire:click="edit({{ $portfolio->id }})"
-                    class="flex-1 py-2.5 bg-gradient-to-b from-amber-500/15 to-amber-500/5 hover:from-amber-500/30 hover:to-amber-500/15 text-amber-300 border border-amber-500/20 hover:border-amber-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm">
+                    class="flex-1 py-2.5 bg-gradient-to-b from-amber-500/15 to-amber-500/5 hover:from-amber-500/30 hover:to-amber-500/15 text-amber-300 border border-amber-500/20 hover:border-amber-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer">
                     <svg class="w-3.5 h-3.5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11 20H8v-3l9.414-9.414z" />
                     </svg>
@@ -554,7 +562,7 @@
                             }
                         })
                     "
-                    class="flex-1 py-2.5 bg-gradient-to-b from-rose-500/15 to-rose-500/5 hover:from-rose-500/30 hover:to-rose-500/15 text-rose-300 border border-rose-500/20 hover:border-rose-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm">
+                    class="flex-1 py-2.5 bg-gradient-to-b from-rose-500/15 to-rose-500/5 hover:from-rose-500/30 hover:to-rose-500/15 text-rose-300 border border-rose-500/20 hover:border-rose-500/50 text-[10px] font-bold rounded-xl tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer">
                     <svg class="w-3.5 h-3.5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -571,6 +579,11 @@
             </div>
         </div>
         @endforelse
+        @if($portfolios->hasPages())
+        <div class="col-span-full mt-8">
+            {{ $portfolios->links() }}
+        </div>
+        @endif
 
     </div>
 
@@ -616,16 +629,19 @@
             width: auto;
             min-width: 280px;
         }
+
         #toast-container>.toast-success {
             background-image: none !important;
             border: 1px solid rgba(16, 185, 129, 0.4);
             color: #6ee7b7 !important;
         }
+
         #toast-container>.toast-error {
             background-image: none !important;
             border: 1px solid rgba(244, 63, 94, 0.4);
             color: #fda4af !important;
         }
+
         #toast-container>div::before {
             font-family: "Font Awesome 5 Free", sans-serif;
             font-weight: 900;
@@ -635,13 +651,39 @@
             transform: translateY(-50%);
             font-size: 18px;
         }
-        #toast-container>.toast-success::before { content: "✓"; color: #34d399; }
-        #toast-container>.toast-error::before { content: "✕"; color: #fb7185; }
-        .toast-progress { opacity: 0.6; }
-        #toast-container>.toast-success .toast-progress { background-color: #34d399; }
-        #toast-container>.toast-error .toast-progress { background-color: #fb7185; }
-        #toast-container .toast-message { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
-        #toast-container .toast-close-button { color: #d4d4d8; opacity: 0.7; }
+
+        #toast-container>.toast-success::before {
+            content: "✓";
+            color: #34d399;
+        }
+
+        #toast-container>.toast-error::before {
+            content: "✕";
+            color: #fb7185;
+        }
+
+        .toast-progress {
+            opacity: 0.6;
+        }
+
+        #toast-container>.toast-success .toast-progress {
+            background-color: #34d399;
+        }
+
+        #toast-container>.toast-error .toast-progress {
+            background-color: #fb7185;
+        }
+
+        #toast-container .toast-message {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        #toast-container .toast-close-button {
+            color: #d4d4d8;
+            opacity: 0.7;
+        }
     </style>
 
 </div>
