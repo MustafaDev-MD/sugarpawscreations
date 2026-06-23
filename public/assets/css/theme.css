@@ -1415,6 +1415,12 @@ section {
 
 #page-header-secion .page-header-cover {
 	background-color: rgba(0, 0, 0, 0.65);
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	transition-property: transform;
+	-webkit-transition: 0.4s ease-in-out;
+	-moz-transition: 0.4s ease-in-out;
+	transition: 0.4s ease-in-out;
 }
 
 /* Album heading image */
@@ -1899,6 +1905,12 @@ section {
 	background-color: #E6EFFF;
 	padding: 40px;
 	border-radius: 4px;
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	transition-property: transform;
+	-webkit-transition: 0.4s ease-in-out;
+	-moz-transition: 0.4s ease-in-out;
+	transition: 0.4s ease-in-out;
 }
 @media (max-width : 991px) {
 	.content-wrap {
@@ -1914,9 +1926,16 @@ section {
 	right: 10px;
 	top: -5px;
 	height: 20px;
+	z-index: -1;
 	/* background-color: rgba(255, 255, 255, 0.8); */
 	background-color: #e6efffc0;
 	border-radius: 4px;
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	transition-property: transform;
+	-webkit-transition: 0.4s ease-in-out;
+	-moz-transition: 0.4s ease-in-out;
+	transition: 0.4s ease-in-out;
 }
 
 
@@ -2402,6 +2421,12 @@ section {
 
 .owl-carousel .owl-stage{
 	background-color: #E6EFFF;
+	-webkit-transition-property: -webkit-transform !important;
+	-moz-transition-property: -moz-transform !important;
+	transition-property: transform !important;
+	-webkit-transition: 0.4s ease-in-out !important;
+	-moz-transition: 0.4s ease-in-out !important;
+	transition: 0.4s ease-in-out !important;
 }
 
 @media (max-width : 767px) {

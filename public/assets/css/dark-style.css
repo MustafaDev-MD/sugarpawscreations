@@ -253,7 +253,7 @@ body,
 }
 
 #page-header-secion+#content-section .content-wrap:before {
-	content: none;
+	background-color: #181c24;
 }
 
 /* Isotope filter */
@@ -675,6 +675,12 @@ hr.hr-short {
 
 .twentytwenty-right-arrow{
 	border-left: 6px solid #161921;
+}
+
+.twentytwenty-horizontal .twentytwenty-handle:after,.twentytwenty-horizontal .twentytwenty-handle:before {
+    -webkit-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5);
+    -moz-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5);
+    box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5);
 }
 
 .pagination>li>a:focus,
