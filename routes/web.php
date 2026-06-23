@@ -22,12 +22,7 @@ Route::get('/category/{category:slug}', [CategoryController::class, 'show'])
     ->name('category.show');
 
 Route::get('/img/{path}', function ($path) {
-    // Pehle public/uploads mein dhundo, phir storage mein (purani images ke liye)
     $fullPath = public_path('uploads/' . $path);
-    
-    if (!file_exists($fullPath)) {
-        $fullPath = storage_path('app/public/' . $path);
-    }
     
     if (!file_exists($fullPath)) {
         abort(404);
@@ -37,6 +32,23 @@ Route::get('/img/{path}', function ($path) {
         'Cache-Control' => 'public, max-age=604800',
     ]);
 })->where('path', '.*');
+
+// Route::get('/img/{path}', function ($path) {
+    
+//     $fullPath = public_path('uploads/' . $path);
+    
+//     if (!file_exists($fullPath)) {
+//         $fullPath = storage_path('app/public/' . $path);
+//     }
+    
+//     if (!file_exists($fullPath)) {
+//         abort(404);
+//     }
+    
+//     return response()->file($fullPath, [
+//         'Cache-Control' => 'public, max-age=604800',
+//     ]);
+// })->where('path', '.*');
 
 /*
 |--------------------------------------------------------------------------
