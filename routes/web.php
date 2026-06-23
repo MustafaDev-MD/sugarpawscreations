@@ -21,17 +21,17 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/category/{category:slug}', [CategoryController::class, 'show'])
     ->name('category.show');
 
-Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
-    $path = storage_path('app/public/' . $folder . '/' . $filename);
+Route::get('/img/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
     
-    if (!file_exists($path)) {
+    if (!file_exists($fullPath)) {
         abort(404);
     }
     
-    return response()->file($path, [
+    return response()->file($fullPath, [
         'Cache-Control' => 'public, max-age=604800',
     ]);
-})->where('filename', '.*');
+})->where('path', '.*');
 
 /*
 |--------------------------------------------------------------------------

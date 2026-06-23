@@ -83,11 +83,11 @@
             <div class="col-md-4">
                 <div class="album-nav">
 
+                     <!-- $prevThumb = $prevCategory->image
+                    ? asset('storage/' . $prevCategory->image)
+                    : asset('assets/img/album-list/grid/img-2.jpg');  -->
                     @php
                     // Prev Category Thumbnail Logic
-                    <!-- $prevThumb = $prevCategory->image
-                    ? asset('storage/' . $prevCategory->image)
-                    : asset('assets/img/album-list/grid/img-2.jpg'); -->
                     $prevThumb = $prevCategory->image
                     ? url('/img/' . $prevCategory->image)
                     : asset('assets/img/album-list/grid/img-2.jpg');
@@ -116,11 +116,11 @@
                         </div>
                     </a>
 
-                    @php
-                    // Next Category Thumbnail Logic
                     <!-- $nextThumb = $nextCategory->image
                     ? asset('storage/' . $nextCategory->image)
                     : asset('assets/img/album-list/grid/img-7.jpg'); -->
+                    @php
+                    // Next Category Thumbnail Logic
                     $nextThumb = $nextCategory->image
                     ? url('/img/' . $nextCategory->image)
                     : asset('assets/img/album-list/grid/img-7.jpg');

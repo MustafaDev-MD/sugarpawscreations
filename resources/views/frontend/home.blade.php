@@ -181,9 +181,9 @@
 
                     <div class="ali-img-wrap">
 
-                        <!-- @php
+                        {{-- @php
                         $image = asset('storage/' . $category->image);
-                        @endphp -->
+                        @endphp --}}
                         @php
                         $image = url('/img/' . $category->image);
                         @endphp
