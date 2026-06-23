@@ -16,7 +16,7 @@ class Portfolios extends Component
     use WithFileUploads;
     use WithPagination;
 
-    protected $paginationTheme = 'tailwind';
+    protected string  $paginationTheme = 'tailwind';
 
     public ?Portfolio $currentPortfolio = null;
 
@@ -252,7 +252,7 @@ class Portfolios extends Component
         $this->resetPage();
     }
 
-    public function updatedPerPage()
+    public function updatedPerPage(): void
     {
         $this->resetPage();
     }

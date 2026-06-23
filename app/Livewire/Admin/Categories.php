@@ -16,7 +16,7 @@ class Categories extends Component
     use WithFileUploads;
     use WithPagination;
 
-    protected $paginationTheme = 'tailwind';
+    protected string $paginationTheme = 'tailwind';
 
     public string $name = '';
 
