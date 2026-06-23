@@ -20,7 +20,7 @@ class Portfolios extends Component
 
     public ?Portfolio $currentPortfolio = null;
 
-    public int $perPage = 10;
+    public int $perPage = 10000;
 
     // Single upload
     public string $title = '';
