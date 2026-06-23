@@ -78,7 +78,7 @@
                     </div>
                 </div> -->
 
-            </div> 
+            </div>
 
             <div class="col-md-4">
                 <div class="album-nav">
@@ -275,8 +275,10 @@
                                 <div class="album-single-item">
 
                                     <div class="before-after-container">
-                                        <img src="{{ asset('storage/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
-                                        <img src="{{ asset('storage/'.$portfolio->after_image) }}" alt="After" class="asi-img">
+                                        <!-- <img src="{{ asset('storage/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
+                                        <img src="{{ asset('storage/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
+                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
+                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy">
                                     </div>
 
                                     <!-- <a class="view-icon ba-trigger"
@@ -288,10 +290,12 @@
                                         <i class="fas fa-eye"></i>
                                     </a> -->
 
+                                    <!-- data-before="{{ asset('storage/'.$portfolio->before_image) }}"
+                                    data-after="{{ asset('storage/'.$portfolio->after_image) }}" -->
                                     <a class="view-icon ba-trigger"
                                         href="javascript:void(0)"
-                                        data-before="{{ asset('storage/'.$portfolio->before_image) }}"
-                                        data-after="{{ asset('storage/'.$portfolio->after_image) }}"
+                                        data-before="{{ url('/img/'.$portfolio->before_image) }}"
+                                        data-after="{{ url('/img/'.$portfolio->after_image) }}"
                                         data-index="{{ $baIndex }}"
                                         onclick="openBeforeAfterModal(this); return false;">
                                         <i class="fas fa-eye"></i>

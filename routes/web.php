@@ -21,6 +21,18 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/category/{category:slug}', [CategoryController::class, 'show'])
     ->name('category.show');
 
+Route::get('/img/{folder}/{filename}', function ($folder, $filename) {
+    $path = storage_path('app/public/' . $folder . '/' . $filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    
+    return response()->file($path, [
+        'Cache-Control' => 'public, max-age=604800',
+    ]);
+})->where('filename', '.*');
+
 /*
 |--------------------------------------------------------------------------
 | Admin / Dashboard (Starter Kit)
