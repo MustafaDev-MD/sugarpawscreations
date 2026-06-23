@@ -162,7 +162,7 @@ class Portfolios extends Component
     {
         $portfolio = Portfolio::findOrFail($id);
 
-        $portfolio = $this->currentPortfolio;
+        $this->currentPortfolio = $portfolio;
 
         $this->portfolioId  = $portfolio->id;
         $this->title        = $portfolio->title;
