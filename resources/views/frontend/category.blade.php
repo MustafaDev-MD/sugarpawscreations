@@ -85,8 +85,11 @@
 
                     @php
                     // Prev Category Thumbnail Logic
-                    $prevThumb = $prevCategory->image
+                    <!-- $prevThumb = $prevCategory->image
                     ? asset('storage/' . $prevCategory->image)
+                    : asset('assets/img/album-list/grid/img-2.jpg'); -->
+                    $prevThumb = $prevCategory->image
+                    ? url('/img/' . $prevCategory->image)
                     : asset('assets/img/album-list/grid/img-2.jpg');
                     @endphp
 
@@ -115,8 +118,11 @@
 
                     @php
                     // Next Category Thumbnail Logic
-                    $nextThumb = $nextCategory->image
+                    <!-- $nextThumb = $nextCategory->image
                     ? asset('storage/' . $nextCategory->image)
+                    : asset('assets/img/album-list/grid/img-7.jpg'); -->
+                    $nextThumb = $nextCategory->image
+                    ? url('/img/' . $nextCategory->image)
                     : asset('assets/img/album-list/grid/img-7.jpg');
                     @endphp
 
