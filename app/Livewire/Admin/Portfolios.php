@@ -119,12 +119,10 @@ class Portfolios extends Component
             'category_id'  => $this->category_id,
             'title'        => $this->title,
             'before_image' => $this->before_image
-                // ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'public')
-                ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'uploads')
+                ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'public')
                 : null,
             'after_image'  => $this->after_image
-                // ? $this->after_image->storeAs('portfolios', $this->generateFilename($this->after_image), 'public')
-                ? $this->after_image->storeAs('portfolios', $this->generateFilename($this->after_image), 'uploads')
+                ? $this->after_image->storeAs('portfolios', $this->generateFilename($this->after_image), 'public')
                 : null,
         ]);
 
@@ -148,9 +146,9 @@ class Portfolios extends Component
             Portfolio::create([
                 'category_id'  => $this->bulk_category_id,
                 'title'        => '',
-                'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'uploads'),
+                'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
                 'after_image'  => $after
-                    ? $after->storeAs('portfolios', $this->generateFilename($after), 'uploads')
+                    ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
                     : null,
             ]);
         }
@@ -195,25 +193,25 @@ class Portfolios extends Component
 
         if ($this->before_image instanceof TemporaryUploadedFile) {
             if ($portfolio->before_image) {
-                Storage::disk('uploads')->delete($portfolio->before_image);
+                Storage::disk('public')->delete($portfolio->before_image);
             }
 
             $data['before_image'] = $this->before_image->storeAs(
                 'portfolios',
                 $this->generateFilename($this->before_image),
-                'uploads'
+                'public'
             );
         }
 
         if ($this->after_image instanceof TemporaryUploadedFile) {
             if ($portfolio->after_image) {
-                Storage::disk('uploads')->delete($portfolio->after_image);
+                Storage::disk('public')->delete($portfolio->after_image);
             }
 
             $data['after_image'] = $this->after_image->storeAs(
                 'portfolios',
                 $this->generateFilename($this->after_image),
-                'uploads'
+                'public'
             );
         }
 
@@ -230,11 +228,11 @@ class Portfolios extends Component
             $portfolio = Portfolio::findOrFail($id);
 
             if ($portfolio->before_image) {
-                Storage::disk('uploads')->delete($portfolio->before_image);
+                Storage::disk('public')->delete($portfolio->before_image);
             }
 
             if ($portfolio->after_image) {
-                Storage::disk('uploads')->delete($portfolio->after_image);
+                Storage::disk('public')->delete($portfolio->after_image);
             }
 
             $portfolio->delete();
