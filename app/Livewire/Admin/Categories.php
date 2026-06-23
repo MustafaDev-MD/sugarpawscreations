@@ -69,7 +69,8 @@ class Categories extends Component
         $this->validate();
 
         $imagePath = $this->image
-            ? $this->image->storeAs('categories', $this->generateFilename($this->image), 'public')
+            // ? $this->image->storeAs('categories', $this->generateFilename($this->image), 'public')
+            ? $this->image->storeAs('categories', $this->generateFilename($this->image), 'uploads')
             : null;
 
         Category::create([
@@ -112,10 +113,10 @@ class Categories extends Component
 
         if ($this->image instanceof TemporaryUploadedFile) {
             if ($category->image) {
-                Storage::disk('public')->delete($category->image);
+                Storage::disk('uploads')->delete($category->image);
             }
 
-            $imagePath = $this->image->storeAs('categories', $this->generateFilename($this->image), 'public');
+            $imagePath = $this->image->storeAs('categories', $this->generateFilename($this->image), 'uploads');
         }
 
         $category->update([

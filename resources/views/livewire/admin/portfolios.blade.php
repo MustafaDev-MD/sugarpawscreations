@@ -133,8 +133,9 @@
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
                                 <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
                                     <!-- <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->before_image) }}" class="w-full h-full object-cover" alt="current before"> -->
+                                    <!-- src="{{ asset('storage/'.$currentPortfolio->before_image) }}" -->
                                     <img
-                                        src="{{ asset('storage/'.$currentPortfolio->before_image) }}"
+                                        src="{{ url('/img/'.$currentPortfolio->before_image) }}"
                                         class="w-full h-full object-cover"
                                         alt="current before">
                                 </div>
@@ -210,8 +211,9 @@
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
                                 <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
                                     <!-- <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->after_image) }}" class="w-full h-full object-cover" alt="current after"> -->
+                                    <!-- src="{{ asset('storage/'.$currentPortfolio->after_image) }}" -->
                                     <img
-                                        src="{{ asset('storage/'.$currentPortfolio->after_image) }}"
+                                        src="{{ url('/img/'.$currentPortfolio->after_image) }}"
                                         class="w-full h-full object-cover"
                                         alt="current after">
                                 </div>
@@ -504,25 +506,25 @@
         <div
             x-data="{ open:false }"
             class="relative w-44">
-    
+
             <button
                 @click="open=!open"
                 type="button"
                 class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-500/40 text-white text-sm font-semibold backdrop-blur-xl cursor-pointer">
-    
+
                 <span>{{ $perPage }} Items</span>
-    
+
                 <svg class="w-4 h-4 text-violet-300">
                     <path fill="currentColor" d="M7 10l5 5 5-5z" />
                 </svg>
             </button>
-    
+
             <div
                 x-show="open"
                 @click.away="open=false"
                 x-transition
                 class="absolute z-50 mt-2 w-full rounded-xl bg-zinc-900/95 backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl">
-    
+
                 @foreach([5,10,15,25,50] as $size)
                 <button
                     @click="open=false"
@@ -534,10 +536,10 @@
                     {{ $size }} Items
                 </button>
                 @endforeach
-    
+
             </div>
         </div>
-    
+
         <div class="text-sm text-slate-400">
             Showing
             <span class="text-fuchsia-300 font-semibold">
@@ -568,7 +570,8 @@
                 <div class="grid grid-cols-2 gap-1.5">
                     <div class="relative overflow-hidden rounded-xl h-32 bg-black/40 border border-white/5">
                         @if($portfolio->before_image)
-                        <img loading="lazy" src="{{ asset('storage/'.$portfolio->before_image) }}"
+                        <!-- <img loading="lazy" src="{{ asset('storage/'.$portfolio->before_image) }}" -->
+                        <img loading="lazy" src="{{ url('/img/'.$portfolio->before_image) }}"
                             class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
                             alt="before">
                         @endif
@@ -576,7 +579,8 @@
                     </div>
                     <div class="relative overflow-hidden rounded-xl h-32 bg-black/40 border border-white/5">
                         @if($portfolio->after_image)
-                        <img loading="lazy" src="{{ asset('storage/'.$portfolio->after_image) }}"
+                        <!-- <img loading="lazy" src="{{ asset('storage/'.$portfolio->after_image) }}" -->
+                        <img loading="lazy" src="{{ url('/img/'.$portfolio->after_image) }}"
                             class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
                             alt="after">
                         @endif

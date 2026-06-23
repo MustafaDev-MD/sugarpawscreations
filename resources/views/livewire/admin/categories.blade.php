@@ -121,7 +121,12 @@
                         {{-- Edit mode: show existing image --}}
                         <div class="flex flex-col items-center gap-3 pointer-events-none">
                             <div class="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 bg-black/50 shadow-lg shadow-black/40">
-                                <img src="{{ asset('storage/'.$existingImage) }}" class="w-full h-full object-cover" alt="current image">
+                                <!-- src="{{ asset('storage/'.$existingImage) }}"  -->
+                                <img 
+                                    src="{{ url('/img/'.$existingImage) }}"
+                                    class="w-full h-full object-cover" 
+                                    alt="current image"
+                                    >
                             </div>
                             <div class="text-xs text-slate-300 font-medium">Current image</div>
                             <span class="text-[10px] uppercase tracking-widest text-fuchsia-300/80 font-bold">Click or drop to replace</span>
@@ -198,25 +203,25 @@
         <div
             x-data="{ open:false }"
             class="relative w-44">
-    
+
             <button
                 @click="open=!open"
                 type="button"
                 class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-500/40 text-white text-sm font-semibold backdrop-blur-xl cursor-pointer">
-    
+
                 <span>{{ $perPage }} Items</span>
-    
+
                 <svg class="w-4 h-4 text-violet-300">
                     <path fill="currentColor" d="M7 10l5 5 5-5z" />
                 </svg>
             </button>
-    
+
             <div
                 x-show="open"
                 @click.away="open=false"
                 x-transition
                 class="absolute z-50 mt-2 w-full rounded-xl bg-zinc-900/95 backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl">
-    
+
                 @foreach([5,10,15,25,50] as $size)
                 <button
                     @click="open=false"
@@ -228,10 +233,10 @@
                     {{ $size }} Items
                 </button>
                 @endforeach
-    
+
             </div>
         </div>
-    
+
         <div class="text-sm text-slate-400">
             Showing
             <span class="text-fuchsia-300 font-semibold">
@@ -262,7 +267,11 @@
             <div class="relative z-10 w-full">
                 <div class="overflow-hidden rounded-xl h-44 w-full mb-3.5 shadow-lg bg-black/40 border border-white/5">
                     @if($cat->image)
-                    <img src="{{ asset('storage/'.$cat->image) }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out" alt="{{ $cat->name }}">
+                    <!-- src="{{ asset('storage/'.$cat->image) }}"  -->
+                    <img
+                        src="{{ asset('storage/'.$cat->image) }}"
+                        class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
+                        alt="{{ $cat->name }}">
                     @else
                     <div class="h-44 w-full bg-gradient-to-br from-violet-950/50 to-fuchsia-950/40 flex flex-col items-center justify-center text-slate-500 gap-1.5 backdrop-blur-sm">
                         <svg class="w-8 h-8 stroke-[1.2] text-violet-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
