@@ -83,7 +83,7 @@
             <div class="col-md-4">
                 <div class="album-nav">
 
-                     <!-- $prevThumb = $prevCategory->image
+                    <!-- $prevThumb = $prevCategory->image
                     ? asset('storage/' . $prevCategory->image)
                     : asset('assets/img/album-list/grid/img-2.jpg');  -->
                     @php
@@ -283,8 +283,10 @@
                                     <div class="before-after-container">
                                         <!-- <img src="{{ asset('storage/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
                                         <img src="{{ asset('storage/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
-                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
-                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy">
+                                        <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
+                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
+                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
+                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img">
                                     </div>
 
                                     <!-- <a class="view-icon ba-trigger"
@@ -445,12 +447,38 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twentytwenty/1.0.0/jquery.twentytwenty.min.js"></script>
 <script>
+    // $(window).on('load', function() {
+    // 
+    //     $(".before-after-container").twentytwenty({
+    //         default_offset_pct: 0.5
+    //     });
+    // 
+    // });
     $(window).on('load', function() {
+        // Pehle sari images load hone ka wait karo
+        var images = document.querySelectorAll('.asi-img');
+        var loaded = 0;
+        var total = images.length;
 
-        $(".before-after-container").twentytwenty({
-            default_offset_pct: 0.5
+        if (total === 0) return;
+
+        function initSlider() {
+            loaded++;
+            if (loaded >= total) {
+                $(".before-after-container").twentytwenty({
+                    default_offset_pct: 0.5
+                });
+            }
+        }
+
+        images.forEach(function(img) {
+            if (img.complete) {
+                initSlider();
+            } else {
+                img.addEventListener('load', initSlider);
+                img.addEventListener('error', initSlider);
+            }
         });
-
     });
     console.log(typeof $.fn.twentytwenty);
 </script>
