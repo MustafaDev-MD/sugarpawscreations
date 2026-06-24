@@ -481,5 +481,5 @@
         });
     });
     console.log(typeof $.fn.twentytwenty);
-</script>
+</script> 
 @endsection
