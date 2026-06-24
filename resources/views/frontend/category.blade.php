@@ -439,7 +439,7 @@
     </div> <!-- /.container -->
 </section>
 <!-- End content section -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twentytwenty/1.0.0/twentytwenty.css">
+<link rel="stylesheet" href="{{ asset('assets/css/twentytwenty.css') }}">
 <!-- End isotope item -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
