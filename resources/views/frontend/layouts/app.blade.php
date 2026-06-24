@@ -98,6 +98,34 @@
 
   </div>
 
+  <!-- Scroll to top button -->
+  <a href="#body" class="scrolltotop sm-scroll"><i class="fas fa-chevron-up"></i></a>
+
+  <!-- ====================
+		///// Scripts below /////
+		===================== -->
+
+  <!-- Core JS -->
+  <script src="{{ asset('assets/vendor/jquery/jquery.min.js') }}"></script> <!-- jquery JS (https://jquery.com) -->
+  <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.min.js') }}"></script> <!-- bootstrap JS (http://getbootstrap.com) -->
+
+  <!-- Libs and Plugins JS -->
+  <script src="{{ asset('assets/vendor/lightgallery/js/lightgallery-all.min.js') }}"></script> <!-- lightGallery JS (http://sachinchoolur.github.io/lightGallery) -->
+
+  <script src="{{ asset('assets/vendor/jquery.mousewheel.min.js') }}"></script> <!-- A jQuery plugin that adds cross browser mouse wheel support -->
+  <script src="{{ asset('assets/vendor/jquery.easing.min.js') }}"></script> <!-- Easing JS (http://gsgd.co.uk/sandbox/jquery/easing/) -->
+  <script src="{{ asset('assets/vendor/isotope.pkgd.min.js') }}"></script> <!-- Isotope JS (http://isotope.metafizzy.co) -->
+  <script src="{{ asset('assets/vendor/imagesloaded.pkgd.min.js') }}"></script> <!-- ImagesLoaded JS (https://github.com/desandro/imagesloaded) -->
+  <script src="{{ asset('assets/vendor/justifiedgallery/js/jquery.justifiedGallery.min.js') }}"></script> <!-- Justified Gallery JS (http://miromannino.github.io/Justified-Gallery/) -->
+  <script src="{{ asset('assets/vendor/ytplayer/js/jquery.mb.YTPlayer.min.js') }}"></script> <!-- YTPlayer JS (more info: https://github.com/pupunzi/jquery.mb.YTPlayer) -->
+  <script src="{{ asset('assets/vendor/owl-carousel/js/owl.carousel.min.js') }}"></script> <!-- Owl Carousel JS (https://owlcarousel2.github.io/OwlCarousel2/) -->
+
+
+  <!-- Theme master JS -->
+  <script src="{{ asset('assets/js/jquery.event.move.js') }}"></script>
+  <script src="{{ asset('assets/js/jquery.twentytwenty.js') }}"></script>
+  <script src="{{ asset('assets/js/theme.js') }}"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
 
@@ -331,36 +359,6 @@
       });
     });
   </script>
-
-  <!-- Scroll to top button -->
-  <a href="#body" class="scrolltotop sm-scroll"><i class="fas fa-chevron-up"></i></a>
-
-  <!-- ====================
-		///// Scripts below /////
-		===================== -->
-
-  <!-- Core JS -->
-  <script src="{{ asset('assets/vendor/jquery/jquery.min.js') }}"></script> <!-- jquery JS (https://jquery.com) -->
-  <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.min.js') }}"></script> <!-- bootstrap JS (http://getbootstrap.com) -->
-
-  <!-- Libs and Plugins JS -->
-  <script src="{{ asset('assets/vendor/lightgallery/js/lightgallery-all.min.js') }}"></script> <!-- lightGallery JS (http://sachinchoolur.github.io/lightGallery) -->
-
-  <script src="{{ asset('assets/vendor/jquery.mousewheel.min.js') }}"></script> <!-- A jQuery plugin that adds cross browser mouse wheel support -->
-  <script src="{{ asset('assets/vendor/jquery.easing.min.js') }}"></script> <!-- Easing JS (http://gsgd.co.uk/sandbox/jquery/easing/) -->
-  <script src="{{ asset('assets/vendor/isotope.pkgd.min.js') }}"></script> <!-- Isotope JS (http://isotope.metafizzy.co) -->
-  <script src="{{ asset('assets/vendor/imagesloaded.pkgd.min.js') }}"></script> <!-- ImagesLoaded JS (https://github.com/desandro/imagesloaded) -->
-  <script src="{{ asset('assets/vendor/justifiedgallery/js/jquery.justifiedGallery.min.js') }}"></script> <!-- Justified Gallery JS (http://miromannino.github.io/Justified-Gallery/) -->
-  <script src="{{ asset('assets/vendor/ytplayer/js/jquery.mb.YTPlayer.min.js') }}"></script> <!-- YTPlayer JS (more info: https://github.com/pupunzi/jquery.mb.YTPlayer) -->
-  <script src="{{ asset('assets/vendor/owl-carousel/js/owl.carousel.min.js') }}"></script> <!-- Owl Carousel JS (https://owlcarousel2.github.io/OwlCarousel2/) -->
-
-
-  <!-- Theme master JS -->
-  <script src="{{ asset('assets/js/jquery.event.move.js') }}"></script>
-  <script src="{{ asset('assets/js/jquery.twentytwenty.js') }}"></script>
-  <script src="{{ asset('assets/js/theme.js') }}"></script>
-
-
 
   <!--==============================
 		///// Begin Google Analytics /////
