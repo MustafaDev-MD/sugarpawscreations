@@ -7,7 +7,7 @@
   <!-- Meta -->
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Sugar Paws Creations | Custom Pet Portraits, Character Art & Digital Illustrations">
+  <meta name="description" content="Transform your beloved pets into beautiful custom artwork. Sugar Paws Creations specializes in pet portraits, character illustrations, digital art, and personalized creative designs made with passion and attention to detail.">
   <meta name="keywords" content="HTML5, CSS3, JavaScript, Bootsrtrap, Responsive, Photography, Portfolio, Template, Theme, Website, Themetorium" />
   <meta name="author" content="themetorium.net">
 
