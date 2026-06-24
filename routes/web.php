@@ -21,8 +21,8 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/category/{category:slug}', [CategoryController::class, 'show'])
     ->name('category.show');
 
-Route::get('/storage/img/{path}', function ($path) {
-    $fullPath = public_path('uploads/' . $path);
+Route::get('/img/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
     
     if (!file_exists($fullPath)) {
         abort(404);
