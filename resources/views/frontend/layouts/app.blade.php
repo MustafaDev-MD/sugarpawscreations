@@ -7,7 +7,7 @@
   <!-- Meta -->
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="HTML5 Photography Portfolio Website Template by Themetorium">
+  <meta name="description" content="Sugar Paws Creations | Custom Pet Portraits, Character Art & Digital Illustrations">
   <meta name="keywords" content="HTML5, CSS3, JavaScript, Bootsrtrap, Responsive, Photography, Portfolio, Template, Theme, Website, Themetorium" />
   <meta name="author" content="themetorium.net">
 

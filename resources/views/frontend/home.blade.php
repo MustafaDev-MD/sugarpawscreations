@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title','Home')
+@section('title','Sugar Paws Creations | Custom Pet Portraits, Character Art & Digital Illustrations')
 
 @section('content')
 
