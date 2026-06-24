@@ -186,6 +186,9 @@
                         @endphp --}}
                         @php
                         $image = url('/img/' . $category->image);
+                        $image = !empty($category->image)
+                        ? url('/img/' . $category->image)
+                        : asset('assets/img/author.jpg');
                         @endphp
 
                         <div class="ali-img bg-image"
