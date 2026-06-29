@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactFormController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CategoryController;
@@ -32,6 +33,12 @@ Route::get('/img/{path}', function ($path) {
         'Cache-Control' => 'public, max-age=604800',
     ]);
 })->where('path', '.*');
+
+Route::get('/contact-us', [HomeController::class, 'contactUs'])
+    ->name('contact-us');
+
+Route::post('/contact-submit', [ContactFormController::class, 'submitContact'])
+    ->name('contact.submit');
 
 // Route::get('/img/{path}', function ($path) {
     

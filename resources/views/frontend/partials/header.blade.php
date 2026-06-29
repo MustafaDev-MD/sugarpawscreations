@@ -9,12 +9,12 @@
 
         <!-- Begin logo -->
         <div id="logo">
-            <a href="/" class="logo-dark">
+            <a href="{{ route('home') }}" class="logo-dark">
                 <!-- <img src="{{ asset('assets/img/logo-dark.png') }}" alt="logo"> -->
                 Sugarpaws Creations
             </a>
 
-            <a href="/" class="logo-light">
+            <a href="{{ route('home') }}" class="logo-light">
                 <!-- <img src="{{ asset('assets/img/logo-light.png') }}" alt="logo"> -->
                 Sugarpaws Creations
             </a>
@@ -92,7 +92,7 @@
 								* Use class "dropdown-menu-dark" to enable dark dropdown menu.
 								-->
                         <li class="dropdown dropdown-hover">
-                            <a href="#0" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a href="{{ route('home') }}" class="dropdown-toggle">
                                 Home
                                 <!-- <span class="caret-2">
                                     <i class="fas fa-chevron-down"></i>
@@ -108,6 +108,12 @@
                             </ul> -->
                         </li>
                         <!-- End dropdown -->
+
+                        <li class="dropdown dropdown-hover">
+                            <a href="{{ route('contact-us') }}" class="dropdown-toggle">
+                                Contact Us
+                            </a>
+                        </li>
 
 
 

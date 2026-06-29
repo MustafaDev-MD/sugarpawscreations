@@ -178,12 +178,14 @@ p {
 
 a, a:focus {
 	text-decoration: none;
-	color: #987F28;
+	/* color: #987F28; */
+	color: inherit;
 	outline: none;
 }
 a:hover {
 	text-decoration: none;
-	color: #B79932;
+	/* color: #B79932; */
+	color: #000;
 }
 img {
 	max-width: 100%;
@@ -4917,14 +4919,14 @@ body.modal-open {
 }
 
 .btn-primary {
-	color: #FFF;
-	background-color: #987F28;
-	border-color: #987F28;
+	color: #161921 !important;
+	background-color: #c9d3e3 !important;
+	border-color: #c9d3e3 !important;
 }
 .btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:active:hover, .btn-primary:focus, .btn-primary:hover, .open > .dropdown-toggle.btn-primary {
-	color: #FFF;
-	background-color: #7F6A1E;
-	border-color: #7F6A1E;
+	color: #E6EFFF !important;
+	background-color: #161921 !important;
+	border-color: #161921 !important;
 }
 
 .btn-success {
@@ -5465,6 +5467,8 @@ blockquote:before {
 	color: #333;
 	border-radius: 20px;
 	border: 1px solid #ddd;
+	background-color: transparent !important;
+	padding: 20px;
 	-webkit-box-shadow: none;
 	box-shadow: none;
 }
@@ -6220,3 +6224,72 @@ label {
 .ba-modal-next.hidden {
     display: none;
 }
+
+
+.toast-msg {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.2s ease;
+        cursor: pointer;
+        min-width: 260px;
+    }
+
+    .toast-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .toast-error {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .toast-removing {
+        animation: fadeOut 0.2s ease forwards;
+    }
+
+    /* ---- Validation Errors Styles ---- */
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    /* Isse placeholder red color ka hojayega */
+    .is-invalid::placeholder {
+        color: #dc3545 !important;
+        opacity: 1;
+    }
+    .is-invalid::-webkit-input-placeholder {
+        color: #dc3545 !important;
+    }
+    .is-invalid::-moz-placeholder {
+        color: #dc3545 !important;
+        opacity: 1;
+    }
+    .is-invalid:-ms-input-placeholder {
+        color: #dc3545 !important;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    @keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+    }
