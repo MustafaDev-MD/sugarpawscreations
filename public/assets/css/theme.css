@@ -1134,6 +1134,12 @@ section {
 	height: 35px;
 }
 
+textarea.form-control {
+    resize: vertical;
+    min-height: 180px;
+    max-height: 350px;
+}
+
 /* Side menu styles (use class "cd-lateral-dark")
 =================================================== */
 /* dark style */
