@@ -107,9 +107,11 @@
 
                             <p style="margin:0;color:#8b93a5;font-size:13px;">
                                 This email was automatically generated from your
-                                <strong style="color:#ffffff;">
-                                    {{ config('app.name') }}
-                                </strong>
+                                <a href="{{ route('home') }}">
+                                    <strong style="color:#ffffff;">
+                                        {{ config('app.name') }}
+                                    </strong>
+                                </a>
                                 commission form.
                             </p>
 
