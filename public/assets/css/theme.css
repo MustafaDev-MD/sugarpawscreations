@@ -172,6 +172,10 @@ body {
 	background-color: #c9d3e3;
 }
 
+.captcha { 
+	margin: 30px 0px;
+}
+
 p {
 	letter-spacing: 1px;
 }

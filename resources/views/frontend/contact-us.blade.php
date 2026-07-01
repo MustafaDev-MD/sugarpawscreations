@@ -78,16 +78,17 @@
                                     </div>
                                 </div>
 
+                                <div class="row captcha">
+                                    <div class="col-lg-12">
+                                        <div class="g-recaptcha"
+                                            data-sitekey="{{ config('services.recaptcha.site_key') }}">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <!-- <button type="submit" id="submit-btn" class="btn btn-primary btn-rounded-5x btn-block">Send Message</button> -->
-                                        <div class="row mb-3">
-                                            <div class="col-lg-12">
-                                                <div class="g-recaptcha"
-                                                    data-sitekey="{{ config('services.recaptcha.site_key') }}">
-                                                </div>
-                                            </div>
-                                        </div>
                                         <button
                                             type="submit"
                                             id="submit-btn"
