@@ -55,9 +55,9 @@ class ContactFormController extends Controller
                 'discord_username'    => 'required|string|max:255',
                 'social_link'         => 'nullable|url|max:255',
                 'commission_details'  => 'nullable|string|max:5000',
-                'recaptcha_token'     => 'required|string',
+                // 'recaptcha_token'     => 'required|string',
+                'g-recaptcha-response' => 'required|string',
             ]);
-
         } catch (ValidationException $e) {
 
             return response()->json([
@@ -69,7 +69,8 @@ class ContactFormController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Verify Google reCAPTCHA v3
+        | Verify Google reCAPTCHA 
+        | Verify Google reCAPTCHA v2 Invisible
         |--------------------------------------------------------------------------
         */
         try {
@@ -78,29 +79,26 @@ class ContactFormController extends Controller
                 'https://www.google.com/recaptcha/api/siteverify',
                 [
                     'secret'   => config('services.recaptcha.secret_key'),
-                    'response' => $validated['recaptcha_token'],
+                    'response' => $validated['g-recaptcha-response'],
                     'remoteip' => $request->ip(),
                 ]
             );
 
             $result = $googleResponse->json();
 
-            if (
-                empty($result['success']) ||
-                ($result['score'] ?? 0) < 0.5 ||
-                ($result['action'] ?? '') !== 'contact'
-            ) {
+            if (!($result['success'] ?? false)) {
 
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'reCAPTCHA verification failed.',
+                    'message' => 'Please complete the reCAPTCHA.',
                 ], 422);
-
             }
 
+            unset($validated['g-recaptcha-response']);
+            
         } catch (\Exception $e) {
 
-            Log::error('reCAPTCHA Error: '.$e->getMessage());
+            Log::error('reCAPTCHA Error: ' . $e->getMessage());
 
             return response()->json([
                 'status' => 'error',
@@ -113,7 +111,9 @@ class ContactFormController extends Controller
         | Remove reCAPTCHA token before saving
         |--------------------------------------------------------------------------
         */
-        unset($validated['recaptcha_token']);
+        // unset($validated['recaptcha_token']);
+
+        unset($validated['g-recaptcha-response']);
 
         /*
         |--------------------------------------------------------------------------
@@ -131,11 +131,9 @@ class ContactFormController extends Controller
 
             Mail::to(config('mail.admin_address'))
                 ->send(new ContactMail($validated));
-
         } catch (\Exception $e) {
 
-            Log::error('Contact mail failed: '.$e->getMessage());
-
+            Log::error('Contact mail failed: ' . $e->getMessage());
         }
 
         /*

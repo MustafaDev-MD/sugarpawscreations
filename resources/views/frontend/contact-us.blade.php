@@ -42,7 +42,7 @@
 
                                 <input type="text" name="website" style="position:absolute; left:-9999px; opacity:0;" tabindex="-1" autocomplete="off">
                                 <input type="hidden" name="form_time" value="{{ time() }}">
-                                <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+                                <!-- <input type="hidden" name="recaptcha_token" id="recaptcha_token"> -->
 
                                 <div class="row">
                                     <div class="col-lg-4">
@@ -80,7 +80,20 @@
 
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <button type="submit" id="submit-btn" class="btn btn-primary btn-rounded-5x btn-block">Send Message</button>
+                                        <!-- <button type="submit" id="submit-btn" class="btn btn-primary btn-rounded-5x btn-block">Send Message</button> -->
+                                        <div class="row mb-3">
+                                            <div class="col-lg-12">
+                                                <div class="g-recaptcha"
+                                                    data-sitekey="{{ config('services.recaptcha.site_key') }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            id="submit-btn"
+                                            class="btn btn-primary btn-rounded-5x btn-block">
+                                            Send Message
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -94,7 +107,8 @@
     </div>
 </section>
 
-<script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
+<!-- <script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script> -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <script>
     (function() {
@@ -125,25 +139,96 @@
         }
 
         form.addEventListener('submit', async function(e) {
-            e.preventDefault();
 
-            clearInvalid();
+    e.preventDefault();
+
+    clearInvalid();
+
+    const originalText = submitBtn.textContent;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    try {
+
+        const res = await fetch(form.action, {
+
+            method: 'POST',
+
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+
+            body: new FormData(form)
+
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+
+            showToast('success', data.message);
+
+            form.reset();
+
+            grecaptcha.reset();
+
+            return;
+        }
+
+        if (res.status === 422 && data.errors) {
+
+            const firstField = Object.keys(data.errors)[0];
+
+            markInvalid(firstField);
+
+            showToast('error', data.errors[firstField][0]);
+
+            return;
+        }
+
+        showToast('error', data.message ?? 'Something went wrong');
+
+    } catch (err) {
+
+        console.error(err);
+
+        showToast('error', 'Network Error');
+
+    } finally {
+
+        submitBtn.disabled = false;
+
+        submitBtn.textContent = originalText;
+
+        const timeInput = form.querySelector('input[name="form_time"]');
+
+        if (timeInput) {
+            timeInput.value = Math.floor(Date.now() / 1000);
+        }
+
+    }
+
+});
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            grecaptcha.execute();
+        });
+
+        // async function onSubmit(token) {
+        window.onSubmit = async function(token) {
+            const submitBtn = document.getElementById('submit-btn');
+
+            submitBtn.disabled = true;
 
             const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending…';
+
+            submitBtn.textContent = 'Sending...';
 
             try {
-
-                await grecaptcha.ready(async () => {});
-
-                const token = await grecaptcha.execute(
-                    "{{ config('services.recaptcha.site_key') }}", {
-                        action: 'contact'
-                    }
-                );
-
-                document.getElementById('recaptcha_token').value = token;
 
                 const res = await fetch(form.action, {
                     method: 'POST',
@@ -160,6 +245,7 @@
                 if (res.ok) {
                     showToast('success', data.message);
                     form.reset();
+                    grecaptcha.reset();
                     return;
                 }
 
@@ -171,24 +257,27 @@
 
                     showToast('error', data.errors[firstField][0]);
 
+                    grecaptcha.reset();
+
                     return;
                 }
 
                 showToast('error', data.message ?? 'Something went wrong');
+                grecaptcha.reset();
 
-            } catch (err) {
-                console.error(err);
+            } catch (e) {
+
                 showToast('error', 'Network Error');
+                grecaptcha.reset();
+
             } finally {
+
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
 
-                const timeInput = form.querySelector('input[name="form_time"]');
-                if (timeInput) {
-                    timeInput.value = Math.floor(Date.now() / 1000);
-                }
             }
-        });
+
+        }
     })();
 </script>
 
