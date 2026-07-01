@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 
 class ContactFormController extends Controller
 {
-    public function submitContact(Request $request)
+    public function submitContact(Request $request): JsonResponse
     {
         /*
         |--------------------------------------------------------------------------

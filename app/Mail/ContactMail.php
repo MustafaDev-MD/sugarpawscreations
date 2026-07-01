@@ -15,10 +15,15 @@ class ContactMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $data;
 
     /**
      * Create a new message instance.
+     *
+     * @param array<string, mixed> $data
      */
     public function __construct(array $data)
     {
