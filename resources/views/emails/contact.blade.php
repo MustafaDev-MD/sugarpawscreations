@@ -16,9 +16,10 @@
 
                     <!-- Header -->
                     <tr>
+                        <!-- 📩 -->
                         <td style="padding:30px;background:#1d232e;text-align:center;">
                             <h1 style="margin:0;color:#ffffff;font-size:26px;">
-                                📩 New Commission Request
+                                New Commission Request
                             </h1>
 
                             <p style="margin-top:8px;color:#9ca3af;font-size:14px;">
