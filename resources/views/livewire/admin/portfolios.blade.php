@@ -452,13 +452,15 @@
             </div>
 
             {{-- Count match warning --}}
-            @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) !== count($bulk_after_images))
+            {{-- @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) !== count($bulk_after_images)) --}}
+            @if(count($bulk_before_images) > 0 && count($bulk_before_images) !== count($bulk_after_images))
             <div class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs font-semibold">
                 ⚠️ Before ({{ count($bulk_before_images) }}) aur After ({{ count($bulk_after_images) }}) images ki count match nahi karti!
             </div>
             @endif
 
             {{-- Count match success --}}
+            {{-- @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) === count($bulk_after_images)) --}}
             @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) === count($bulk_after_images))
             <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs font-semibold">
                 ✓ {{ count($bulk_before_images) }} pairs ready to upload!

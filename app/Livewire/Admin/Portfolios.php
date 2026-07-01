@@ -69,18 +69,18 @@ class Portfolios extends Component
      *
      * @return array<string, mixed>
      */
-    protected function bulkRules(): array
-    {
-        return [
-            'bulk_category_id'      => 'required|exists:categories,id',
-            // 'bulk_before_images'    => 'required|array|min:1',
-            'bulk_before_images' => 'nullable|array',
-            // 'bulk_before_images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-            'bulk_before_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'bulk_after_images'     => 'required|array|min:1',
-            'bulk_after_images.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-        ];
-    }
+    // protected function bulkRules(): array
+    // {
+    //     return [
+    //         'bulk_category_id'      => 'required|exists:categories,id',
+    //         // 'bulk_before_images'    => 'required|array|min:1',
+    //         'bulk_before_images' => 'nullable|array',
+    //         // 'bulk_before_images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+    //         'bulk_before_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+    //         'bulk_after_images'     => 'required|array|min:1',
+    //         'bulk_after_images.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+    //     ];
+    // }
 
     private function generateFilename(TemporaryUploadedFile $file): string
     {
@@ -145,79 +145,167 @@ class Portfolios extends Component
         $this->dispatch('success', message: 'Portfolio Added Successfully');
     }
 
+    // public function saveBulk(): void
+    // {
+    //     // $this->validate($this->bulkRules());
+
+    //     // if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
+    //     //     $this->dispatch('error', message: 'Before/After images count must match');
+    //     //     return;
+    //     // }
+
+    //     $category = Category::find($this->bulk_category_id);
+
+    //     // if (
+    //     //     $category?->has_before_image &&
+    //     //     count($this->bulk_before_images) !== count($this->bulk_after_images)
+    //     // ) {
+    //     //     $this->dispatch('error', message: 'Before/After images count must match');
+    //     //     return;
+    //     // }
+
+    //     if (
+    //         $category?->has_before_image &&
+    //         count($this->bulk_before_images) > 0 &&
+    //         count($this->bulk_before_images) !== count($this->bulk_after_images)
+    //     ) {
+    //         $this->dispatch('error', message: 'Before/After images count must match');
+    //         return;
+    //     }
+
+    //     // foreach ($this->bulk_before_images as $i => $before) {
+    //     //     $after = $this->bulk_after_images[$i] ?? null;
+
+    //     //     Portfolio::create([
+    //     //         'category_id'  => $this->bulk_category_id,
+    //     //         'title'        => '',
+    //     //         'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
+    //     //         'after_image'  => $after
+    //     //             ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
+    //     //             : null,
+    //     //     ]);
+    //     // }
+
+    //     $category = Category::findOrFail($this->bulk_category_id);
+
+    //     $rules = [
+    //         'bulk_category_id'    => 'required|exists:categories,id',
+    //         'bulk_after_images'   => 'required|array|min:1',
+    //         'bulk_after_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+    //     ];
+
+    //     if ($category->has_before_image) {
+    //         $rules['bulk_before_images'] = 'required|array|min:1';
+    //         $rules['bulk_before_images.*'] = 'image|mimes:jpg,jpeg,png,webp|max:4096';
+    //     }
+
+    //     $this->validate($rules);
+
+    //     if ($category->has_before_image) {
+
+    //         // if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
+    //         //     $this->dispatch('error', message: 'Before/After images count must match');
+    //         //     return;
+    //         // }
+
+    //         if (
+    //             count($this->bulk_before_images) > 0 &&
+    //             count($this->bulk_before_images) !== count($this->bulk_after_images)
+    //         ) {
+    //             $this->dispatch('error', message: 'Before/After images count must match');
+    //             return;
+    //         }
+
+    //         foreach ($this->bulk_before_images as $i => $before) {
+
+    //             $after = $this->bulk_after_images[$i];
+
+    //             Portfolio::create([
+    //                 'category_id' => $this->bulk_category_id,
+    //                 'title' => '',
+    //                 'before_image' => $before->storeAs(
+    //                     'portfolios',
+    //                     $this->generateFilename($before),
+    //                     'public'
+    //                 ),
+    //                 'after_image' => $after->storeAs(
+    //                     'portfolios',
+    //                     $this->generateFilename($after),
+    //                     'public'
+    //                 ),
+    //             ]);
+    //         }
+    //     } else {
+
+    //         foreach ($this->bulk_after_images as $after) {
+
+    //             Portfolio::create([
+    //                 'category_id' => $this->bulk_category_id,
+    //                 'title' => '',
+    //                 'before_image' => null,
+    //                 'after_image' => $after->storeAs(
+    //                     'portfolios',
+    //                     $this->generateFilename($after),
+    //                     'public'
+    //                 ),
+    //             ]);
+    //         }
+    //     }
+
+    //     $this->resetBulk();
+
+    //     $this->dispatch('success', message: 'Bulk portfolios uploaded successfully');
+    // }
+
     public function saveBulk(): void
     {
-        $this->validate($this->bulkRules());
-
-        // if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
-        //     $this->dispatch('error', message: 'Before/After images count must match');
-        //     return;
-        // }
-
-        $category = Category::find($this->bulk_category_id);
-
-        if (
-            $category?->has_before_image &&
-            count($this->bulk_before_images) !== count($this->bulk_after_images)
-        ) {
-            $this->dispatch('error', message: 'Before/After images count must match');
-            return;
-        }
-
-        // foreach ($this->bulk_before_images as $i => $before) {
-        //     $after = $this->bulk_after_images[$i] ?? null;
-
-        //     Portfolio::create([
-        //         'category_id'  => $this->bulk_category_id,
-        //         'title'        => '',
-        //         'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
-        //         'after_image'  => $after
-        //             ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
-        //             : null,
-        //     ]);
-        // }
+        // 1. Initial validation for the category ID
+        $this->validate([
+            'bulk_category_id' => 'required|exists:categories,id',
+        ]);
 
         $category = Category::findOrFail($this->bulk_category_id);
 
-        if ($category->has_before_image) {
+        // 2. Base rules: After images are always required for a portfolio entry
+        $rules = [
+            'bulk_after_images'   => 'required|array|min:1',
+            'bulk_after_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+        ];
 
+        // 3. Conditional strict validation rules only if before images are present
+        if ($category->has_before_image && !empty($this->bulk_before_images)) {
+            $rules['bulk_before_images']   = 'required|array|min:1';
+            $rules['bulk_before_images.*'] = 'image|mimes:jpg,jpeg,png,webp|max:4096';
+        }
+
+        $this->validate($rules);
+
+        // 4. If before images are uploaded, enforce a strict matching count pair
+        if ($category->has_before_image && !empty($this->bulk_before_images)) {
             if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
                 $this->dispatch('error', message: 'Before/After images count must match');
                 return;
             }
 
+            // Loop through pairs safely since counts match
             foreach ($this->bulk_before_images as $i => $before) {
-
                 $after = $this->bulk_after_images[$i];
 
                 Portfolio::create([
-                    'category_id' => $this->bulk_category_id,
-                    'title' => '',
-                    'before_image' => $before->storeAs(
-                        'portfolios',
-                        $this->generateFilename($before),
-                        'public'
-                    ),
-                    'after_image' => $after->storeAs(
-                        'portfolios',
-                        $this->generateFilename($after),
-                        'public'
-                    ),
+                    'category_id'  => $this->bulk_category_id,
+                    'title'        => '',
+                    'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
+                    'after_image'  => $after->storeAs('portfolios', $this->generateFilename($after), 'public'),
                 ]);
             }
         } else {
-
+            // 5. If no before images were uploaded (or category doesn't support them), just save after images
             foreach ($this->bulk_after_images as $after) {
-
                 Portfolio::create([
-                    'category_id' => $this->bulk_category_id,
-                    'title' => '',
+                    'category_id'  => $this->bulk_category_id,
+                    'title'        => '',
                     'before_image' => null,
-                    'after_image' => $after->storeAs(
-                        'portfolios',
-                        $this->generateFilename($after),
-                        'public'
-                    ),
+                    'after_image'  => $after->storeAs('portfolios', $this->generateFilename($after), 'public'),
                 ]);
             }
         }
@@ -306,28 +394,28 @@ class Portfolios extends Component
             $data['before_image'] = null;
         }
 
-        if ($category->has_before_image) {
+        // if ($category->has_before_image) {
 
-            if ($this->before_image instanceof TemporaryUploadedFile) {
+        //     if ($this->before_image instanceof TemporaryUploadedFile) {
 
-                if ($portfolio->before_image) {
-                    Storage::disk('public')->delete($portfolio->before_image);
-                }
+        //         if ($portfolio->before_image) {
+        //             Storage::disk('public')->delete($portfolio->before_image);
+        //         }
 
-                $data['before_image'] = $this->before_image->storeAs(
-                    'portfolios',
-                    $this->generateFilename($this->before_image),
-                    'public'
-                );
-            }
-        } else {
+        //         $data['before_image'] = $this->before_image->storeAs(
+        //             'portfolios',
+        //             $this->generateFilename($this->before_image),
+        //             'public'
+        //         );
+        //     }
+        // } else {
 
-            if ($portfolio->before_image) {
-                Storage::disk('public')->delete($portfolio->before_image);
-            }
+        //     if ($portfolio->before_image) {
+        //         Storage::disk('public')->delete($portfolio->before_image);
+        //     }
 
-            $data['before_image'] = null;
-        }
+        //     $data['before_image'] = null;
+        // }
 
         if ($this->after_image instanceof TemporaryUploadedFile) {
             if ($portfolio->after_image) {
