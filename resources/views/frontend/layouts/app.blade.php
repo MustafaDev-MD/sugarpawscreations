@@ -86,6 +86,9 @@
       <div id="modalBAContainer">
         <img id="modalBeforeImg" src="" alt="Before">
         <img id="modalAfterImg" src="" alt="After">
+
+        <!-- Single Image -->
+        <img id="modalSingleImg" src="" alt="Image" style="display:none;">
       </div>
       <!-- Counter -->
       <div class="ba-modal-counter">
@@ -211,7 +214,7 @@
     });
   </script>
 
-  <script>
+  <!-- <script>
     // Saare before/after items ka array
     var baItems = [];
     var baCurrentIdx = 0;
@@ -267,6 +270,19 @@
       var container = document.getElementById('modalBAContainer');
       var beforeImg = document.getElementById('modalBeforeImg');
       var afterImg = document.getElementById('modalAfterImg');
+
+      if (!before || before.endsWith('/img/') || before === window.location.origin + '/img/') {
+
+        beforeImg.style.display = 'none';
+        afterImg.style.display = 'block';
+
+        afterImg.src = after;
+
+        container.classList.remove('twentytwenty-container');
+        $(container).find('.twentytwenty-handle, .twentytwenty-overlay').remove();
+
+        return;
+      }
 
       // TwentyTwenty reset
       var $container = $(container);
@@ -357,6 +373,228 @@
           $('#perPageForm').submit();
         }, 100);
       });
+    });
+  </script> -->
+
+  <script>
+    // Saare before/after items ka array
+    var baItems = [];
+    var baCurrentIdx = 0;
+
+    $(document).ready(function() {
+
+      $('.ba-trigger').each(function() {
+        baItems.push({
+          before: $(this).data('before'),
+          after: $(this).data('after')
+        });
+      });
+
+      if (baItems.length <= 1) {
+        $('.ba-modal-prev, .ba-modal-next').addClass('hidden');
+      }
+
+      $('#baTotalCount').text(baItems.length);
+    });
+
+    function openBeforeAfterModal(element) {
+
+      var index = parseInt(element.getAttribute('data-index'), 10);
+
+      baCurrentIdx = index;
+
+      loadBeforeAfter(
+        baItems[index].before,
+        baItems[index].after
+      );
+
+      $('#baCurrentIndex').text(index + 1);
+
+      document.getElementById('beforeAfterModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function changeBeforeAfter(direction) {
+
+      baCurrentIdx += direction;
+
+      if (baCurrentIdx < 0) {
+        baCurrentIdx = baItems.length - 1;
+      }
+
+      if (baCurrentIdx >= baItems.length) {
+        baCurrentIdx = 0;
+      }
+
+      $('#baCurrentIndex').text(baCurrentIdx + 1);
+
+      loadBeforeAfter(
+        baItems[baCurrentIdx].before,
+        baItems[baCurrentIdx].after
+      );
+    }
+
+    function loadBeforeAfter(before, after) {
+
+      var container = document.getElementById('modalBAContainer');
+
+      var beforeImg = document.getElementById('modalBeforeImg');
+      var afterImg = document.getElementById('modalAfterImg');
+
+      var $container = $(container);
+
+      // Purana TwentyTwenty remove
+      if ($container.hasClass('twentytwenty-container')) {
+        $container.twentytwenty('destroy');
+      }
+
+      $container.removeClass('twentytwenty-container');
+      $container.find('.twentytwenty-handle, .twentytwenty-overlay').remove();
+
+      // Reset
+      container.style.width = 'auto';
+      container.style.height = 'auto';
+
+      beforeImg.style.width = '';
+      beforeImg.style.height = '';
+
+      afterImg.style.width = '';
+      afterImg.style.height = '';
+
+      beforeImg.style.maxWidth = '';
+      beforeImg.style.maxHeight = '';
+
+      afterImg.style.maxWidth = '';
+      afterImg.style.maxHeight = '';
+
+      // ==========================
+      // ONLY AFTER IMAGE
+      // ==========================
+
+      if (!before || before.endsWith('/img/')) {
+
+        beforeImg.style.display = 'none';
+        afterImg.style.display = 'block';
+
+        afterImg.src = after;
+
+        afterImg.onload = function() {
+
+          var natW = afterImg.naturalWidth;
+          var natH = afterImg.naturalHeight;
+
+          var maxW = window.innerWidth * 0.85;
+          var maxH = (window.innerHeight - 120) * 0.90;
+
+          var ratio = Math.min(maxW / natW, maxH / natH, 1);
+
+          container.style.width = Math.round(natW * ratio) + 'px';
+          container.style.height = Math.round(natH * ratio) + 'px';
+
+          afterImg.style.width = '100%';
+          afterImg.style.height = '100%';
+        };
+
+        if (afterImg.complete) {
+          afterImg.onload();
+        }
+
+        return;
+      }
+
+      // ==========================
+      // BEFORE / AFTER
+      // ==========================
+
+      beforeImg.style.display = 'block';
+      afterImg.style.display = 'block';
+
+      beforeImg.src = before;
+      afterImg.src = after;
+
+      afterImg.onload = function() {
+
+        var natW = afterImg.naturalWidth;
+        var natH = afterImg.naturalHeight;
+
+        var maxW = window.innerWidth * 0.85;
+        var maxH = (window.innerHeight - 120) * 0.90;
+
+        var ratio = Math.min(maxW / natW, maxH / natH, 1);
+
+        var finalW = Math.round(natW * ratio);
+        var finalH = Math.round(natH * ratio);
+
+        container.style.width = finalW + 'px';
+        container.style.height = finalH + 'px';
+
+        beforeImg.style.width = finalW + 'px';
+        beforeImg.style.height = finalH + 'px';
+
+        afterImg.style.width = finalW + 'px';
+        afterImg.style.height = finalH + 'px';
+
+        beforeImg.style.maxWidth = 'none';
+        beforeImg.style.maxHeight = 'none';
+
+        afterImg.style.maxWidth = 'none';
+        afterImg.style.maxHeight = 'none';
+
+        $container.twentytwenty({
+          default_offset_pct: 0.5
+        });
+      };
+
+      if (afterImg.complete) {
+        afterImg.onload();
+      }
+    }
+
+    function closeBeforeAfterModal() {
+
+      document.getElementById('beforeAfterModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+
+      if (document.getElementById('beforeAfterModal').style.display === 'flex') {
+
+        if (e.key === 'Escape') {
+          closeBeforeAfterModal();
+        }
+
+        if (e.key === 'ArrowRight') {
+          changeBeforeAfter(1);
+        }
+
+        if (e.key === 'ArrowLeft') {
+          changeBeforeAfter(-1);
+        }
+      }
+    });
+
+    document.getElementById('beforeAfterModal').addEventListener('click', function(e) {
+
+      if (e.target === this || e.target.id === 'modalWrapper') {
+        closeBeforeAfterModal();
+      }
+    });
+
+    $(document).ready(function() {
+
+      $(document).on('change', '#show-items', function() {
+        $('#perPageForm').submit();
+      });
+
+      $(document).on('click', '.select-styled + .options li, .show-on-page ul li', function() {
+
+        setTimeout(function() {
+          $('#perPageForm').submit();
+        }, 100);
+
+      });
+
     });
   </script>
 

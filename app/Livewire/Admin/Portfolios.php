@@ -22,6 +22,8 @@ class Portfolios extends Component
 
     public int $perPage = 10;
 
+    public bool $remove_before_image = false;
+
     // Single upload
     public string $title = '';
     public ?int $category_id = null;
@@ -71,8 +73,10 @@ class Portfolios extends Component
     {
         return [
             'bulk_category_id'      => 'required|exists:categories,id',
-            'bulk_before_images'    => 'required|array|min:1',
-            'bulk_before_images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            // 'bulk_before_images'    => 'required|array|min:1',
+            'bulk_before_images' => 'nullable|array',
+            // 'bulk_before_images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            'bulk_before_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'bulk_after_images'     => 'required|array|min:1',
             'bulk_after_images.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
         ];
@@ -95,6 +99,7 @@ class Portfolios extends Component
             'portfolioId',
             'editMode',
             'currentPortfolio',
+            'remove_before_image',
         ]);
 
         $this->resetErrorBag();
@@ -115,11 +120,20 @@ class Portfolios extends Component
     {
         $this->validate($this->singleRules());
 
+        $category = Category::findOrFail($this->category_id);
+
         Portfolio::create([
             'category_id'  => $this->category_id,
             'title'        => $this->title,
-            'before_image' => $this->before_image
-                ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'public')
+            // 'before_image' => $this->before_image
+            //     ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'public')
+            //     : null,
+            'before_image' => $category->has_before_image && $this->before_image
+                ? $this->before_image->storeAs(
+                    'portfolios',
+                    $this->generateFilename($this->before_image),
+                    'public'
+                )
                 : null,
             'after_image'  => $this->after_image
                 ? $this->after_image->storeAs('portfolios', $this->generateFilename($this->after_image), 'public')
@@ -135,22 +149,77 @@ class Portfolios extends Component
     {
         $this->validate($this->bulkRules());
 
-        if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
+        // if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
+        //     $this->dispatch('error', message: 'Before/After images count must match');
+        //     return;
+        // }
+
+        $category = Category::find($this->bulk_category_id);
+
+        if (
+            $category?->has_before_image &&
+            count($this->bulk_before_images) !== count($this->bulk_after_images)
+        ) {
             $this->dispatch('error', message: 'Before/After images count must match');
             return;
         }
 
-        foreach ($this->bulk_before_images as $i => $before) {
-            $after = $this->bulk_after_images[$i] ?? null;
+        // foreach ($this->bulk_before_images as $i => $before) {
+        //     $after = $this->bulk_after_images[$i] ?? null;
 
-            Portfolio::create([
-                'category_id'  => $this->bulk_category_id,
-                'title'        => '',
-                'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
-                'after_image'  => $after
-                    ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
-                    : null,
-            ]);
+        //     Portfolio::create([
+        //         'category_id'  => $this->bulk_category_id,
+        //         'title'        => '',
+        //         'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
+        //         'after_image'  => $after
+        //             ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
+        //             : null,
+        //     ]);
+        // }
+
+        $category = Category::findOrFail($this->bulk_category_id);
+
+        if ($category->has_before_image) {
+
+            if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
+                $this->dispatch('error', message: 'Before/After images count must match');
+                return;
+            }
+
+            foreach ($this->bulk_before_images as $i => $before) {
+
+                $after = $this->bulk_after_images[$i];
+
+                Portfolio::create([
+                    'category_id' => $this->bulk_category_id,
+                    'title' => '',
+                    'before_image' => $before->storeAs(
+                        'portfolios',
+                        $this->generateFilename($before),
+                        'public'
+                    ),
+                    'after_image' => $after->storeAs(
+                        'portfolios',
+                        $this->generateFilename($after),
+                        'public'
+                    ),
+                ]);
+            }
+        } else {
+
+            foreach ($this->bulk_after_images as $after) {
+
+                Portfolio::create([
+                    'category_id' => $this->bulk_category_id,
+                    'title' => '',
+                    'before_image' => null,
+                    'after_image' => $after->storeAs(
+                        'portfolios',
+                        $this->generateFilename($after),
+                        'public'
+                    ),
+                ]);
+            }
         }
 
         $this->resetBulk();
@@ -171,6 +240,8 @@ class Portfolios extends Component
         $this->before_image = null;
         $this->after_image  = null;
 
+        $this->remove_before_image = false;
+
         $this->editMode = true;
 
         $this->dispatch('edit-mode-activated');
@@ -179,6 +250,8 @@ class Portfolios extends Component
     public function update(): void
     {
         $this->validate($this->singleRules());
+
+        $category = Category::findOrFail($this->category_id);
 
         if (!$this->portfolioId) {
             return;
@@ -191,16 +264,69 @@ class Portfolios extends Component
             'title'       => $this->title,
         ];
 
-        if ($this->before_image instanceof TemporaryUploadedFile) {
+        // if ($this->before_image instanceof TemporaryUploadedFile) {
+        //     if ($portfolio->before_image) {
+        //         Storage::disk('public')->delete($portfolio->before_image);
+        //     }
+
+        //     $data['before_image'] = $this->before_image->storeAs(
+        //         'portfolios',
+        //         $this->generateFilename($this->before_image),
+        //         'public'
+        //     );
+        // }
+
+        if ($this->remove_before_image) {
+
             if ($portfolio->before_image) {
                 Storage::disk('public')->delete($portfolio->before_image);
             }
 
-            $data['before_image'] = $this->before_image->storeAs(
-                'portfolios',
-                $this->generateFilename($this->before_image),
-                'public'
-            );
+            $data['before_image'] = null;
+        } elseif ($category->has_before_image) {
+
+            if ($this->before_image instanceof TemporaryUploadedFile) {
+
+                if ($portfolio->before_image) {
+                    Storage::disk('public')->delete($portfolio->before_image);
+                }
+
+                $data['before_image'] = $this->before_image->storeAs(
+                    'portfolios',
+                    $this->generateFilename($this->before_image),
+                    'public'
+                );
+            }
+        } else {
+
+            if ($portfolio->before_image) {
+                Storage::disk('public')->delete($portfolio->before_image);
+            }
+
+            $data['before_image'] = null;
+        }
+
+        if ($category->has_before_image) {
+
+            if ($this->before_image instanceof TemporaryUploadedFile) {
+
+                if ($portfolio->before_image) {
+                    Storage::disk('public')->delete($portfolio->before_image);
+                }
+
+                $data['before_image'] = $this->before_image->storeAs(
+                    'portfolios',
+                    $this->generateFilename($this->before_image),
+                    'public'
+                );
+            }
+        } else {
+
+            if ($portfolio->before_image) {
+                Storage::disk('public')->delete($portfolio->before_image);
+            }
+
+            $data['before_image'] = null;
         }
 
         if ($this->after_image instanceof TemporaryUploadedFile) {
@@ -262,7 +388,8 @@ class Portfolios extends Component
         // $query = Portfolio::with('category')->latest();
 
         $query = Portfolio::query()
-            ->with(['category:id,name'])
+            // ->with(['category:id,name'])
+            ->with(['category:id,name,has_before_image'])
             ->latest();
 
         if ($this->selectedCategory !== 'all') {
@@ -271,7 +398,10 @@ class Portfolios extends Component
 
         return view('livewire.admin.portfolios', [
             'portfolios' => $query->paginate($this->perPage),
-            'categories' => Category::select('id', 'name')->latest()->get(),
+            // 'categories' => Category::select('id', 'name')->latest()->get(),
+            'categories' => Category::select('id', 'name', 'has_before_image')
+                ->latest()
+                ->get(),
         ]);
     }
 }

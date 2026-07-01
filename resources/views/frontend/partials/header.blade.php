@@ -63,7 +63,7 @@
                                         <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
                                     </svg>
                                     <svg class="sun-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="stroke: currentColor; stroke-width: 0.6; stroke-linecap: round; fill: none;">
-                                        <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" />
+                                        <circle cx="12" cy="12" r="5.7" fill="currentColor" stroke="none" />
                                         <!-- top -->
                                         <line x1="12" y1="7" x2="12" y2="4.5" />
                                         <!-- bottom -->

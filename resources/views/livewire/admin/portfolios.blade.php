@@ -152,9 +152,20 @@
                                 <p class="text-[10px] text-slate-500">PNG, JPG, WEBP · 4MB max</p>
                             </div>
                             @endif
+
                         </template>
 
                     </div>
+                    @if($editMode && $currentPortfolio?->before_image)
+                    <div class="mt-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" wire:model.live="remove_before_image">
+                            <span class="text-xs text-red-400">
+                                Remove Before Image
+                            </span>
+                        </label>
+                    </div>
+                    @endif
                     <div wire:loading wire:target="before_image" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
                         <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -504,25 +515,25 @@
         <div
             x-data="{ open:false }"
             class="relative w-44">
-    
+
             <button
                 @click="open=!open"
                 type="button"
                 class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-500/40 text-white text-sm font-semibold backdrop-blur-xl cursor-pointer">
-    
+
                 <span>{{ $perPage }} Items</span>
-    
+
                 <svg class="w-4 h-4 text-violet-300">
                     <path fill="currentColor" d="M7 10l5 5 5-5z" />
                 </svg>
             </button>
-    
+
             <div
                 x-show="open"
                 @click.away="open=false"
                 x-transition
                 class="absolute z-50 mt-2 w-full rounded-xl bg-zinc-900/95 backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl">
-    
+
                 @foreach([5,10,15,25,50] as $size)
                 <button
                     @click="open=false"
@@ -534,10 +545,10 @@
                     {{ $size }} Items
                 </button>
                 @endforeach
-    
+
             </div>
         </div>
-    
+
         <div class="text-sm text-slate-400">
             Showing
             <span class="text-fuchsia-300 font-semibold">
