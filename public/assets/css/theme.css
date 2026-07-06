@@ -6129,6 +6129,7 @@ label {
 /* hover effect */
 .view-icon:hover {
     background: #000;
+	color: #E6EFFF;
     transform: translateX(-50%) scale(1.1);
 }
 
