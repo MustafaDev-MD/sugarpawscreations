@@ -64,24 +64,6 @@ class Portfolios extends Component
         ];
     }
 
-    /**
-     * Rules for the bulk upload form.
-     *
-     * @return array<string, mixed>
-     */
-    // protected function bulkRules(): array
-    // {
-    //     return [
-    //         'bulk_category_id'      => 'required|exists:categories,id',
-    //         // 'bulk_before_images'    => 'required|array|min:1',
-    //         'bulk_before_images' => 'nullable|array',
-    //         // 'bulk_before_images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-    //         'bulk_before_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-    //         'bulk_after_images'     => 'required|array|min:1',
-    //         'bulk_after_images.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-    //     ];
-    // }
-
     private function generateFilename(TemporaryUploadedFile $file): string
     {
         $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -144,118 +126,6 @@ class Portfolios extends Component
 
         $this->dispatch('success', message: 'Portfolio Added Successfully');
     }
-
-    // public function saveBulk(): void
-    // {
-    //     // $this->validate($this->bulkRules());
-
-    //     // if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
-    //     //     $this->dispatch('error', message: 'Before/After images count must match');
-    //     //     return;
-    //     // }
-
-    //     $category = Category::find($this->bulk_category_id);
-
-    //     // if (
-    //     //     $category?->has_before_image &&
-    //     //     count($this->bulk_before_images) !== count($this->bulk_after_images)
-    //     // ) {
-    //     //     $this->dispatch('error', message: 'Before/After images count must match');
-    //     //     return;
-    //     // }
-
-    //     if (
-    //         $category?->has_before_image &&
-    //         count($this->bulk_before_images) > 0 &&
-    //         count($this->bulk_before_images) !== count($this->bulk_after_images)
-    //     ) {
-    //         $this->dispatch('error', message: 'Before/After images count must match');
-    //         return;
-    //     }
-
-    //     // foreach ($this->bulk_before_images as $i => $before) {
-    //     //     $after = $this->bulk_after_images[$i] ?? null;
-
-    //     //     Portfolio::create([
-    //     //         'category_id'  => $this->bulk_category_id,
-    //     //         'title'        => '',
-    //     //         'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
-    //     //         'after_image'  => $after
-    //     //             ? $after->storeAs('portfolios', $this->generateFilename($after), 'public')
-    //     //             : null,
-    //     //     ]);
-    //     // }
-
-    //     $category = Category::findOrFail($this->bulk_category_id);
-
-    //     $rules = [
-    //         'bulk_category_id'    => 'required|exists:categories,id',
-    //         'bulk_after_images'   => 'required|array|min:1',
-    //         'bulk_after_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-    //     ];
-
-    //     if ($category->has_before_image) {
-    //         $rules['bulk_before_images'] = 'required|array|min:1';
-    //         $rules['bulk_before_images.*'] = 'image|mimes:jpg,jpeg,png,webp|max:4096';
-    //     }
-
-    //     $this->validate($rules);
-
-    //     if ($category->has_before_image) {
-
-    //         // if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
-    //         //     $this->dispatch('error', message: 'Before/After images count must match');
-    //         //     return;
-    //         // }
-
-    //         if (
-    //             count($this->bulk_before_images) > 0 &&
-    //             count($this->bulk_before_images) !== count($this->bulk_after_images)
-    //         ) {
-    //             $this->dispatch('error', message: 'Before/After images count must match');
-    //             return;
-    //         }
-
-    //         foreach ($this->bulk_before_images as $i => $before) {
-
-    //             $after = $this->bulk_after_images[$i];
-
-    //             Portfolio::create([
-    //                 'category_id' => $this->bulk_category_id,
-    //                 'title' => '',
-    //                 'before_image' => $before->storeAs(
-    //                     'portfolios',
-    //                     $this->generateFilename($before),
-    //                     'public'
-    //                 ),
-    //                 'after_image' => $after->storeAs(
-    //                     'portfolios',
-    //                     $this->generateFilename($after),
-    //                     'public'
-    //                 ),
-    //             ]);
-    //         }
-    //     } else {
-
-    //         foreach ($this->bulk_after_images as $after) {
-
-    //             Portfolio::create([
-    //                 'category_id' => $this->bulk_category_id,
-    //                 'title' => '',
-    //                 'before_image' => null,
-    //                 'after_image' => $after->storeAs(
-    //                     'portfolios',
-    //                     $this->generateFilename($after),
-    //                     'public'
-    //                 ),
-    //             ]);
-    //         }
-    //     }
-
-    //     $this->resetBulk();
-
-    //     $this->dispatch('success', message: 'Bulk portfolios uploaded successfully');
-    // }
 
     public function saveBulk(): void
     {
@@ -352,18 +222,6 @@ class Portfolios extends Component
             'title'       => $this->title,
         ];
 
-        // if ($this->before_image instanceof TemporaryUploadedFile) {
-        //     if ($portfolio->before_image) {
-        //         Storage::disk('public')->delete($portfolio->before_image);
-        //     }
-
-        //     $data['before_image'] = $this->before_image->storeAs(
-        //         'portfolios',
-        //         $this->generateFilename($this->before_image),
-        //         'public'
-        //     );
-        // }
-
         if ($this->remove_before_image) {
 
             if ($portfolio->before_image) {
@@ -393,29 +251,6 @@ class Portfolios extends Component
 
             $data['before_image'] = null;
         }
-
-        // if ($category->has_before_image) {
-
-        //     if ($this->before_image instanceof TemporaryUploadedFile) {
-
-        //         if ($portfolio->before_image) {
-        //             Storage::disk('public')->delete($portfolio->before_image);
-        //         }
-
-        //         $data['before_image'] = $this->before_image->storeAs(
-        //             'portfolios',
-        //             $this->generateFilename($this->before_image),
-        //             'public'
-        //         );
-        //     }
-        // } else {
-
-        //     if ($portfolio->before_image) {
-        //         Storage::disk('public')->delete($portfolio->before_image);
-        //     }
-
-        //     $data['before_image'] = null;
-        // }
 
         if ($this->after_image instanceof TemporaryUploadedFile) {
             if ($portfolio->after_image) {
