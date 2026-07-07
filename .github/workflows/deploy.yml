@@ -1,0 +1,32 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+
+          script: |
+            cd ~/domains/sugarpawscreations.com/public_html/demo
+
+            git pull origin main
+
+            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+            php artisan migrate --force
+
+            php artisan optimize:clear
+
+            php artisan optimize
