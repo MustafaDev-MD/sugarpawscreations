@@ -17,12 +17,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
-
           script: |
             cd ~/domains/sugarpawscreations.com/public_html/demo
 
-            git pull origin main
-
-            php artisan optimize:clear
-
-            php artisan optimize
+            git fetch origin
+            git reset --hard origin/main
