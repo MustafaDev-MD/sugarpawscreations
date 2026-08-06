@@ -42,7 +42,7 @@
                     this.$refs.afterInput.value = '';
                 }
             }
-        }"   
+        }"
 
         x-on:reset-previews.window="resetPreviews()"
         x-on:edit-mode-activated.window="
