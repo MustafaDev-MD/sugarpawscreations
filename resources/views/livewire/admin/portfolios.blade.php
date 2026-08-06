@@ -33,6 +33,14 @@
             resetPreviews() {
                 this.beforePreview = null;
                 this.afterPreview = null;
+
+                if (this.$refs.beforeInput) {
+                    this.$refs.beforeInput.value = '';
+                }
+
+                if (this.$refs.afterInput) {
+                    this.$refs.afterInput.value = '';
+                }
             }
         }"
 
@@ -260,7 +268,7 @@
             <div class="w-full">
                 @if($editMode)
                 <div class="flex gap-2.5">
-                    <button wire:click="update" @click="resetPreviews()"
+                    <button wire:click="update"
                         class="flex-1 h-[52px] bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:shadow-[0_8px_25px_-5px_rgba(251,146,60,0.5)] hover:brightness-110 text-slate-950 font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-900/30 active:scale-[0.97] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
                         <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.213 15M12 10v4l3 3" />
@@ -273,7 +281,7 @@
                     </button>
                 </div>
                 @else
-                <button wire:click="save" @click="resetPreviews()"
+                <button wire:click="save"
                     class="w-full h-[52px] bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:shadow-[0_8px_25px_-5px_rgba(217,70,239,0.5)] hover:brightness-110 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-fuchsia-900/30 active:scale-[0.97] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -468,8 +476,8 @@
             @endif
 
             {{-- Save Bulk Button --}}
+            <!-- @click="bulkBeforePreviews = []; bulkAfterPreviews = [];" -->
             <button wire:click="saveBulk"
-                @click="bulkBeforePreviews = []; bulkAfterPreviews = [];"
                 wire:loading.attr="disabled"
                 class="w-full h-[52px] bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:shadow-[0_8px_25px_-5px_rgba(16,185,129,0.5)] hover:brightness-110 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg active:scale-[0.97] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                 <span wire:loading.remove wire:target="saveBulk">

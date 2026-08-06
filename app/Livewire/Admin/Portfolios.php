@@ -60,7 +60,7 @@ class Portfolios extends Component
             'title'        => 'nullable|string|max:255',
             'category_id'  => 'required|exists:categories,id',
             'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'after_image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'after_image'  => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
         ];
     }
 
@@ -123,6 +123,8 @@ class Portfolios extends Component
         ]);
 
         $this->resetInput();
+
+        $this->dispatch('reset-previews');
 
         $this->dispatch('success', message: 'Portfolio Added Successfully');
     }
@@ -267,6 +269,8 @@ class Portfolios extends Component
         $portfolio->update($data);
 
         $this->resetInput();
+
+        $this->dispatch('reset-previews');
 
         $this->dispatch('success', message: 'Portfolio Updated Successfully');
     }
