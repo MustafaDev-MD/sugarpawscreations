@@ -76,7 +76,7 @@ class Portfolios extends Component
         $this->reset([
             'title',
             'category_id',
-            'before_image',
+            'before_image', 
             'after_image',
             'portfolioId',
             'editMode',
