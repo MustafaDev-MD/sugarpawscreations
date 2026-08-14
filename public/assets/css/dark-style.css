@@ -472,7 +472,8 @@ a.al-at-link:focus {
 .owl-carousel .owl-nav .owl-next:hover {
 	/* background-color: rgba(0, 0, 0, 0.85); */
 	background-color: #161921f0;
-	color: #FFF;
+	/* color: #FFF; */
+	color: #9F3BFF;
 }
 
 .owl-carousel .owl-nav .owl-prev.disabled,
