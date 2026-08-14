@@ -381,6 +381,7 @@ section {
 /* header fixed top */
 #header.fixed-top {
 	position: fixed;
+	padding: 20px 0px;
 }
 
 /* 
@@ -430,7 +431,7 @@ section {
 	letter-spacing: 6px;
 }
 #logo img {
-	max-height: 38px;
+	max-height: 52px;
 }
 
 /* Disable logo-light */
