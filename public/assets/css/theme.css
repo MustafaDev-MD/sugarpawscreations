@@ -406,10 +406,10 @@ section {
 }
 
 /* header filled */
-#header.header-filled {
+/* #header.header-filled {
 	padding-top: 0;
 	padding-bottom: 0;
-}
+} */
 
 /* ------------------------------------------------------------- *
  * Logo
@@ -1050,6 +1050,11 @@ section {
 	background-color: rgba(111, 111, 111, 0.1);
 	color: #000;
 }
+
+.cd-navigation li p{
+	font-size: 12px;
+}
+
 @media only screen and (min-width: 768px) {
 	#cd-lateral-nav .cd-navigation {
 		margin: 0 0 20px 0;
@@ -2354,7 +2359,8 @@ textarea.form-control {
 	text-transform: uppercase;
 	font-size: 15px;
 	font-weight: 500;
-	color: #333;
+	/* color: #333; */
+	color: #9F3BFF;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -3250,8 +3256,10 @@ textarea.form-control {
 }
 .owl-carousel .owl-nav .owl-prev:hover, 
 .owl-carousel .owl-nav .owl-next:hover {
-	background-color: rgba(255, 255, 255, 0.85);
-	color: #333;
+	/* background-color: rgba(255, 255, 255, 0.85); */
+	background-color: #e6efffdb;
+	/* color: #333; */
+	color: #9F3BFF;
 }
 .owl-carousel .owl-nav .owl-prev {
 	left: 10px;
@@ -3273,6 +3281,7 @@ textarea.form-control {
 .owl-carousel .owl-nav .owl-next.disabled {
 	background-color: rgba(173, 173, 173, 0.3);
 	color: #888;
+	display: none;
 }
 
 /* Prev/Next buttons positions outside (left/right) */

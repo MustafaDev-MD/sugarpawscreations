@@ -142,28 +142,40 @@
 				===================== -->
         <ul class="cd-navigation">
 
-            <li>About Us</li>
+            <li>About Me</li>
+            <li>
+                <p>
+                    A 22-year-old artist bringing ideas to life through concept art and creative design. From stunning 2D and 3D visuals to personalized fursonas, VRChat avatars, animations, and custom merch, I’ve got it all covered!
+                </p>
+            </li>
+
+            <li>My Vision</li>
+            <li>
+                <p>
+                    My goal isn't just to craft beautiful designs—it's to tell stories, spark joy, and give my clients something truly unique to cherish. I envision a world where art inspires and empowers, and I’m honored to play a part in helping others express themselves through my creations.
+                </p>
+            </li>
 
             <!-- Begin submenu -->
-            <li class="item-has-children">
+            <!-- <li class="item-has-children">
                 <a href="#0">Submenu<span class="caret-2"><i class="fas fa-chevron-down"></i></span></a>
                 <ul class="sub-menu">
                     <li><a class="link" href="#">Sub Link 1</a></li>
                     <li><a class="link" href="#">Sub Link 2</a></li>
                     <li><a class="link" href="#">Sub Link 3</a></li>
                 </ul>
-            </li>
+            </li> -->
             <!-- End submenu -->
 
-            <li class="cd-menu-separator"></li>
+            <!-- <li class="cd-menu-separator"></li> -->
 
         </ul>
         <!-- End nav links -->
 
         <!-- Begin nav content box -->
-        <div class="cd-content-box">
+        <!-- <div class="cd-content-box"> -->
 
-            <h2 class="cd-menu-heading">Instagram:</h2>
+            <!-- <h2 class="cd-menu-heading">Instagram:</h2> -->
 
             <!-- Begin thumbnail list 
 					==========================
@@ -183,7 +195,7 @@
             </ul> -->
             <!-- End thumbnail list -->
 
-        </div>
+        <!-- </div> -->
         <!-- End nav content box -->
 
 

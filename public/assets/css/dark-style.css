@@ -134,7 +134,7 @@ a:hover {
 	color: #999;
 }
 
-.cd-navigation li>a {
+.cd-navigation li>a,.cd-navigation li {
 	color: #999;
 }
 
@@ -359,7 +359,8 @@ a.al-at-link:focus {
 }
 
 .album-list-item .ali-title {
-	color: #EEE;
+	/* color: #EEE; */
+	color: #9F3BFF;
 }
 
 .album-list-item .ali-meta {
