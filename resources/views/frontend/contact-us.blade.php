@@ -18,13 +18,13 @@
                                 <i class="fas fa-envelope"></i> <a href="mailto:clumsycutie20@gmail.com">clumsycutie20@gmail.com</a>
                             </address>
 
-                            <div class="social-icons">
+                            <!-- <div class="social-icons">
                                 <ul>
                                     <li><a target="_blank" href="https://www.facebook.com" title="Follow us on Facebook"><i class="fab fa-facebook-f"></i></a></li>
                                     <li><a target="_blank" href="https://twitter.com/" title="Follow us on Twitter"><i class="fab fa-twitter"></i></a></li>
                                     <li><a target="_blank" href="https://www.discord.com" title="Follow us on Discord"><i class="fab fa-discord"></i></a></li>
                                 </ul>
-                            </div>
+                            </div> -->
 
                         </div>
                         <div class="col-md-8">
