@@ -426,6 +426,12 @@
          there's no JS file-state to keep in sync. --}}
     <div
         x-data="{}"
+        x-on:bulk-before-merged.window="if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = ''"
+        x-on:bulk-after-merged.window="if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = ''"
+        x-on:reset-bulk-previews.window="
+            if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = '';
+            if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = '';
+        "
 
         class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5">
 
@@ -485,7 +491,7 @@
                                 <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
                                     <img
-                                        src="{{ $image->temporaryUrl() }}"
+                                        src="{{ $file->temporaryUrl() }}"
                                         class="w-full h-full object-cover rounded-lg">
 
                                     {{-- REMOVE THIS IMAGE --}}
@@ -551,7 +557,7 @@
                                 <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
                                     <img
-                                        src="{{ $image->temporaryUrl() }}"
+                                        src="{{ $file->temporaryUrl() }}"
                                         class="w-full h-full object-cover">
 
                                     <button
