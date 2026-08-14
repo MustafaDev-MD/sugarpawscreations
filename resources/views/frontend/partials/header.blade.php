@@ -149,12 +149,12 @@
                 </p>
             </li>
 
-            <!-- <li>My Vision</li>
+            <li>My Vision</li>
             <li>
                 <p>
                     My goal isn't just to craft beautiful designs—it's to tell stories, spark joy, and give my clients something truly unique to cherish. I envision a world where art inspires and empowers, and I’m honored to play a part in helping others express themselves through my creations.
                 </p>
-            </li> -->
+            </li>
 
             <!-- Begin submenu -->
             <!-- <li class="item-has-children">

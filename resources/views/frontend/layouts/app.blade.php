@@ -35,10 +35,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Template master CSS -->
-  <link rel="stylesheet" href="{{ asset('assets/css/twentytwenty.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
-  <!-- <link rel="stylesheet" href="{{ asset('assets/css/dark-style.css') }}"> -->
-  <link rel="stylesheet" href="{{ asset('assets/css/helper.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/twentytwenty.css') }}?v={{ filemtime(public_path('assets/css/twentytwenty.css')) }}">
+
+  <link rel="stylesheet" href="{{ asset('assets/css/theme.css') }}?v={{ filemtime(public_path('assets/css/theme.css')) }}">
+
+  <!-- <link rel="stylesheet"
+      href="{{ asset('assets/css/dark-style.css') }}?v={{ filemtime(public_path('assets/css/dark-style.css')) }}"> -->
+
+  <link rel="stylesheet" href="{{ asset('assets/css/helper.css') }}?v={{ filemtime(public_path('assets/css/helper.css')) }}">
 
   <!-- Template dark style CSS (comment or uncomment below line to enable/disable template dark style) -->
   <!-- <link rel="stylesheet" href="assets/css/dark-style.css"> -->
