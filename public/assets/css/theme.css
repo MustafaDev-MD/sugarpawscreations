@@ -250,6 +250,7 @@ address {
 	margin-bottom: 30px;
 	font-style: normal;
 	line-height: inherit;
+	color: #9F3BFF;
 }
 
 
@@ -5367,7 +5368,8 @@ body.modal-open {
 }
 
 .btn-primary {
-	color: #161921 !important;
+	/* color: #161921 !important; */
+	color: #9F3BFF !important;
 	background-color: #c9d3e3 !important;
 	border-color: #c9d3e3 !important;
 }

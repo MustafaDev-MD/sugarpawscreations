@@ -168,7 +168,8 @@ a:hover {
 	border-color: #181c24 !important;
 }
 .btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:active:hover, .btn-primary:focus, .btn-primary:hover, .open > .dropdown-toggle.btn-primary {
-	color: #181c24 !important;
+	/* color: #181c24 !important; */
+	color: #9F3BFF !important;
 	background-color: #c9d3e3 !important;
 	border-color: #c9d3e3 !important;
 }
