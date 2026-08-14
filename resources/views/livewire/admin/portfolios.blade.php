@@ -485,7 +485,7 @@
                                 <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
                                     <img
-                                        src="{{ $file->temporaryUrl() }}"
+                                        src="{{ $image->temporaryUrl() }}"
                                         class="w-full h-full object-cover rounded-lg">
 
                                     {{-- REMOVE THIS IMAGE --}}
@@ -551,7 +551,7 @@
                                 <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
                                     <img
-                                        src="{{ $file->temporaryUrl() }}"
+                                        src="{{ $image->temporaryUrl() }}"
                                         class="w-full h-full object-cover">
 
                                     <button
