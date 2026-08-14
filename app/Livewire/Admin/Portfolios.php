@@ -148,6 +148,8 @@ class Portfolios extends Component
             unset($this->bulk_before_images[$index]);
             $this->bulk_before_images = array_values($this->bulk_before_images);
         }
+
+        $this->dispatch('bulk-before-image-removed', index: $index);
     }
 
     public function removeBulkAfterImage(int $index): void
@@ -156,6 +158,8 @@ class Portfolios extends Component
             unset($this->bulk_after_images[$index]);
             $this->bulk_after_images = array_values($this->bulk_after_images);
         }
+
+        $this->dispatch('bulk-after-image-removed', index: $index);
     }
 
     public function saveBulk(): void

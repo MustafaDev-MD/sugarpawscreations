@@ -443,6 +443,8 @@
         }"
         x-on:bulk-before-merged.window="if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = ''"
         x-on:bulk-after-merged.window="if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = ''"
+        x-on:bulk-before-image-removed.window="bulkBeforePreviews.splice($event.detail.index, 1)"
+        x-on:bulk-after-image-removed.window="bulkAfterPreviews.splice($event.detail.index, 1)"
         x-on:reset-bulk-previews.window="
             bulkBeforePreviews = [];
             bulkAfterPreviews = [];
@@ -515,7 +517,6 @@
                                     {{-- REMOVE THIS IMAGE --}}
                                     <button
                                         type="button"
-                                        @click="bulkBeforePreviews.splice({{ $i }}, 1)"
                                         wire:click.stop="removeBulkBeforeImage({{ $i }})"
                                         class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
                                         <svg class="w-2.5 h-2.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -582,7 +583,6 @@
 
                                     <button
                                         type="button"
-                                        @click="bulkAfterPreviews.splice({{ $i }}, 1)"
                                         wire:click.stop="removeBulkAfterImage({{ $i }})"
                                         class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
                                         <svg class="w-2.5 h-2.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
