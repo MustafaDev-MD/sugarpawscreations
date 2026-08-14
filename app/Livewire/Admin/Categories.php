@@ -10,6 +10,7 @@ use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
 
 class Categories extends Component
 {
@@ -28,7 +29,7 @@ class Categories extends Component
 
     public bool $editMode = false;
 
-    public int $perPage = 5;
+    public int|string $perPage = 5;
 
     /**
      * @var array<string, string>
@@ -66,19 +67,41 @@ class Categories extends Component
 
     public function save(): void
     {
-        $this->validate();
+        $this->validate([
+            'name' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+            ],
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $slug = Str::slug($this->name);
+
+        // Check duplicate slug
+        if (Category::where('slug', $slug)->exists()) {
+            $this->addError('name', 'A category with this name already exists.');
+            return;
+        }
 
         $imagePath = $this->image
-            ? $this->image->storeAs('categories', $this->generateFilename($this->image), 'public')
+            ? $this->image->storeAs(
+                'categories',
+                $this->generateFilename($this->image),
+                'public'
+            )
             : null;
 
         Category::create([
             'name'  => $this->name,
-            'slug'  => Str::slug($this->name),
+            'slug'  => $slug,
             'image' => $imagePath,
         ]);
 
         $this->resetInput();
+
+        $this->dispatch('category-form-reset');
 
         $this->dispatch('success', message: 'Category Added Successfully');
     }
@@ -100,13 +123,33 @@ class Categories extends Component
 
     public function update(): void
     {
-        $this->validate();
-
         if (!$this->categoryId) {
             return;
         }
 
+        $this->validate([
+            'name' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+            ],
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
         $category = Category::findOrFail($this->categoryId);
+
+        $slug = Str::slug($this->name);
+
+        // Check duplicate slug, but ignore current category
+        if (
+            Category::where('slug', $slug)
+            ->where('id', '!=', $this->categoryId)
+            ->exists()
+        ) {
+            $this->addError('name', 'A category with this name already exists.');
+            return;
+        }
 
         $imagePath = $category->image;
 
@@ -115,16 +158,24 @@ class Categories extends Component
                 Storage::disk('public')->delete($category->image);
             }
 
-            $imagePath = $this->image->storeAs('categories', $this->generateFilename($this->image), 'public');
+            $imagePath = $this->image->storeAs(
+                'categories',
+                $this->generateFilename($this->image),
+                'public'
+            );
         }
 
         $category->update([
             'name'  => $this->name,
-            'slug'  => Str::slug($this->name),
+            'slug'  => $slug,
             'image' => $imagePath,
         ]);
 
         $this->resetInput();
+
+        $this->dispatch('category-form-reset');
+
+        $this->dispatch('category-updated');
 
         $this->dispatch('success', message: 'Category Updated Successfully');
     }
@@ -158,8 +209,16 @@ class Categories extends Component
 
     public function render(): View
     {
+        $query = Category::latest();
+
+        if ($this->perPage === 'all') {
+            $categories = $query->get();
+        } else {
+            $categories = $query->paginate((int) $this->perPage);
+        }
+
         return view('livewire.admin.categories', [
-            'categories' => Category::latest()->paginate($this->perPage),
+            'categories' => $categories,
         ]);
     }
 }

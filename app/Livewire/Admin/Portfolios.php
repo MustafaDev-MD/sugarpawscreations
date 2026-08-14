@@ -20,9 +20,10 @@ class Portfolios extends Component
 
     public ?Portfolio $currentPortfolio = null;
 
-    public int $perPage = 10;
+    public int|string $perPage = 10;
 
     public bool $remove_before_image = false;
+    public bool $remove_after_image = false;
 
     // Single upload
     public string $title = '';
@@ -47,6 +48,24 @@ class Portfolios extends Component
      */
     public array $bulk_after_images = [];
 
+    /**
+     * Temporary staging property. Each time the user selects files in the
+     * "Before" bulk input, Livewire uploads them here first. The
+     * updatedBulkBeforeBatch() hook then merges them into
+     * $bulk_before_images and clears this property — so previously
+     * selected files are never lost when the user adds more.
+     *
+     * @var array<int, TemporaryUploadedFile>
+     */
+    public array $bulk_before_batch = [];
+
+    /**
+     * Same staging mechanism as $bulk_before_batch, for the "After" input.
+     *
+     * @var array<int, TemporaryUploadedFile>
+     */
+    public array $bulk_after_batch = [];
+
     public string $selectedCategory = 'all';
 
     /**
@@ -57,10 +76,21 @@ class Portfolios extends Component
     protected function singleRules(): array
     {
         return [
-            'title'        => 'nullable|string|max:255',
-            'category_id'  => 'required|exists:categories,id',
+            'title' => 'nullable|string|max:255',
+
+            'category_id' => 'required|exists:categories,id',
+
             'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'after_image'  => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+
+            'after_image' => $this->editMode
+                ? [
+                    'required_without:currentPortfolio.after_image',
+                    'nullable',
+                    'image',
+                    'mimes:jpg,jpeg,png,webp',
+                    'max:4096',
+                ]
+                : 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
         ];
     }
 
@@ -68,7 +98,8 @@ class Portfolios extends Component
     {
         $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $ext  = $file->getClientOriginalExtension();
-        return $name . '_' . time() . '.' . $ext;
+
+        return $name . '_' . uniqid() . '.' . $ext;
     }
 
     public function resetInput(): void
@@ -76,12 +107,13 @@ class Portfolios extends Component
         $this->reset([
             'title',
             'category_id',
-            'before_image', 
+            'before_image',
             'after_image',
             'portfolioId',
             'editMode',
             'currentPortfolio',
             'remove_before_image',
+            'remove_after_image',
         ]);
 
         $this->resetErrorBag();
@@ -93,9 +125,42 @@ class Portfolios extends Component
             'bulk_category_id',
             'bulk_before_images',
             'bulk_after_images',
+            'bulk_before_batch',
+            'bulk_after_batch',
         ]);
 
         $this->resetErrorBag();
+    }
+
+    /**
+     * Fires automatically whenever Livewire finishes uploading files into
+     * $bulk_before_batch (i.e. whenever the user selects files in the
+     * "Before" bulk input). Merges the newly uploaded batch into the
+     * persistent $bulk_before_images array, then clears the batch and
+     * tells the browser to reset the file input so it's ready for the
+     * next selection.
+     */
+    public function updatedBulkBeforeBatch(): void
+    {
+        if (!empty($this->bulk_before_batch)) {
+            $this->bulk_before_images = array_merge($this->bulk_before_images, $this->bulk_before_batch);
+            $this->bulk_before_batch = [];
+        }
+
+        $this->dispatch('bulk-before-merged');
+    }
+
+    /**
+     * Same as updatedBulkBeforeBatch() but for the "After" bulk input.
+     */
+    public function updatedBulkAfterBatch(): void
+    {
+        if (!empty($this->bulk_after_batch)) {
+            $this->bulk_after_images = array_merge($this->bulk_after_images, $this->bulk_after_batch);
+            $this->bulk_after_batch = [];
+        }
+
+        $this->dispatch('bulk-after-merged');
     }
 
     public function save(): void
@@ -107,9 +172,6 @@ class Portfolios extends Component
         Portfolio::create([
             'category_id'  => $this->category_id,
             'title'        => $this->title,
-            // 'before_image' => $this->before_image
-            //     ? $this->before_image->storeAs('portfolios', $this->generateFilename($this->before_image), 'public')
-            //     : null,
             'before_image' => $category->has_before_image && $this->before_image
                 ? $this->before_image->storeAs(
                     'portfolios',
@@ -124,9 +186,27 @@ class Portfolios extends Component
 
         $this->resetInput();
 
+        $this->dispatch('$refresh');
+
         $this->dispatch('reset-previews');
 
         $this->dispatch('success', message: 'Portfolio Added Successfully');
+    }
+
+    public function removeBulkBeforeImage(int $index): void
+    {
+        if (isset($this->bulk_before_images[$index])) {
+            unset($this->bulk_before_images[$index]);
+            $this->bulk_before_images = array_values($this->bulk_before_images);
+        }
+    }
+
+    public function removeBulkAfterImage(int $index): void
+    {
+        if (isset($this->bulk_after_images[$index])) {
+            unset($this->bulk_after_images[$index]);
+            $this->bulk_after_images = array_values($this->bulk_after_images);
+        }
     }
 
     public function saveBulk(): void
@@ -184,6 +264,8 @@ class Portfolios extends Component
 
         $this->resetBulk();
 
+        $this->dispatch('reset-bulk-previews');
+
         $this->dispatch('success', message: 'Bulk portfolios uploaded successfully');
     }
 
@@ -201,17 +283,78 @@ class Portfolios extends Component
         $this->after_image  = null;
 
         $this->remove_before_image = false;
+        $this->remove_after_image = false;
 
         $this->editMode = true;
 
         $this->dispatch('edit-mode-activated');
     }
 
+    public function removeBeforeImage(): void
+    {
+        $this->before_image = null;
+        $this->remove_before_image = true;
+
+        $this->dispatch('before-image-removed');
+    }
+
+    public function removeAfterImage(): void
+    {
+        $this->after_image = null;
+        $this->remove_after_image = true;
+
+        $this->dispatch('after-image-removed');
+    }
+
     public function update(): void
     {
-        $this->validate($this->singleRules());
+        $this->validate([
+            'title' => 'nullable|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'after_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ]);
 
         $category = Category::findOrFail($this->category_id);
+
+        if (!$this->portfolioId) {
+            return;
+        }
+
+        $portfolio = Portfolio::findOrFail($this->portfolioId);
+
+        // After image must always exist after update.
+        // If existing image is removed, a new image must be uploaded.
+        if (
+            $this->remove_after_image &&
+            !($this->after_image instanceof TemporaryUploadedFile)
+        ) {
+            $this->addError(
+                'after_image',
+                'After image is required.'
+            );
+
+            return;
+        }
+
+        // If there is no existing After image and no new image,
+        // update must not continue.
+        if (
+            !$portfolio->after_image &&
+            !($this->after_image instanceof TemporaryUploadedFile)
+        ) {
+            $this->addError(
+                'after_image',
+                'After image is required.'
+            );
+
+            return;
+        }
+
+        $data = [
+            'category_id' => $this->category_id,
+            'title' => $this->title,
+        ];
 
         if (!$this->portfolioId) {
             return;
@@ -254,7 +397,15 @@ class Portfolios extends Component
             $data['before_image'] = null;
         }
 
-        if ($this->after_image instanceof TemporaryUploadedFile) {
+        if ($this->remove_after_image) {
+
+            if ($portfolio->after_image) {
+                Storage::disk('public')->delete($portfolio->after_image);
+            }
+
+            $data['after_image'] = null;
+        } elseif ($this->after_image instanceof TemporaryUploadedFile) {
+
             if ($portfolio->after_image) {
                 Storage::disk('public')->delete($portfolio->after_image);
             }
@@ -290,6 +441,8 @@ class Portfolios extends Component
 
             $portfolio->delete();
 
+            $this->dispatch('$refresh');
+
             $this->dispatch('success', message: 'Portfolio Deleted Successfully');
         } catch (\Throwable $e) {
             logger()->error($e->getMessage());
@@ -312,10 +465,7 @@ class Portfolios extends Component
 
     public function render(): View
     {
-        // $query = Portfolio::with('category')->latest();
-
         $query = Portfolio::query()
-            // ->with(['category:id,name'])
             ->with(['category:id,name,has_before_image'])
             ->latest();
 
@@ -323,9 +473,16 @@ class Portfolios extends Component
             $query->where('category_id', $this->selectedCategory);
         }
 
+        // "All" ka matlab hai sab records ek hi page par — total count ko
+        // hi perPage bana dete hain taake paginator theek se kaam kare
+        // (aur agar table khaali ho to at least 1 pass karte hain warna
+        // paginate() error deta hai).
+        $perPage = $this->perPage === 'all'
+            ? max((clone $query)->count(), 1)
+            : (int) $this->perPage;
+
         return view('livewire.admin.portfolios', [
-            'portfolios' => $query->paginate($this->perPage),
-            // 'categories' => Category::select('id', 'name')->latest()->get(),
+            'portfolios' => $query->paginate($perPage),
             'categories' => Category::select('id', 'name', 'has_before_image')
                 ->latest()
                 ->get(),

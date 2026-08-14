@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    {{-- FORM SECTION --}}
+    {{-- FORM SECTION (single create/update) --}}
     <div
         x-data="{
             isDraggingBefore: false,
@@ -45,12 +45,19 @@
         }"
 
         x-on:reset-previews.window="resetPreviews()"
+        x-on:before-image-removed.window="
+            beforePreview = null;
+
+            if ($refs.beforeInput) {
+                $refs.beforeInput.value = '';
+            }
+        "
         x-on:edit-mode-activated.window="
         beforePreview = null;
         afterPreview = null;
         $el.scrollIntoView({ behavior: 'smooth', block: 'start' });"
 
-        class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30 cursor-pointer">
+        class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5 transition-all duration-300 hover:border-violet-500/30">
 
         {{-- Form mode indicator --}}
         <div class="flex items-center gap-2">
@@ -83,7 +90,7 @@
                 <label class="text-[11px] font-bold text-violet-300/80 uppercase tracking-wider pl-1">Category</label>
                 <select
                     wire:model="category_id"
-                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40">
+                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40 cursor-pointer">
                     <option value="" class="bg-zinc-900">— Select Category —</option>
                     @foreach($categories as $cat)
                     <option value="{{ $cat->id }}" class="bg-zinc-900">{{ $cat->name }}</option>
@@ -106,15 +113,22 @@
                         @drop.prevent="
                             isDraggingBefore = false;
                             const file = $event.dataTransfer.files[0];
+
                             if (file) {
                                 const dt = new DataTransfer();
                                 dt.items.add(file);
+
                                 $refs.beforeInput.files = dt.files;
-                                $refs.beforeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                $refs.beforeInput.dispatchEvent(
+                                    new Event('change', { bubbles: true })
+                                );
+
                                 readFile(file, 'beforePreview');
                             }
                         "
-                        :class="isDraggingBefore ? 'border-fuchsia-500/80 bg-fuchsia-500/[0.06] scale-[1.01]' : 'border-white/15 hover:border-fuchsia-500/50 hover:bg-white/[0.02]'"
+                        :class="isDraggingBefore
+                            ? 'border-fuchsia-500/80 bg-fuchsia-500/[0.06] scale-[1.01]'
+                            : 'border-white/15 hover:border-fuchsia-500/50 hover:bg-white/[0.02]'"
                         class="relative flex flex-col items-center justify-center text-center bg-black/40 border-2 border-dashed rounded-2xl px-4 py-8 transition-all duration-300 shadow-inner shadow-black/40 cursor-pointer group min-h-[180px]">
 
                         <input
@@ -125,55 +139,102 @@
                             @change="readFile($event.target.files[0], 'beforePreview')"
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
 
-                        {{-- Alpine preview (new file selected) --}}
+                        {{-- NEW IMAGE PREVIEW --}}
                         <template x-if="beforePreview">
-                            <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                    <img :src="beforePreview" class="w-full h-full object-cover" alt="before preview">
+                            <div class="relative flex flex-col items-center gap-2">
+
+                                <div class="relative w-24 h-24 rounded-xl overflow-visible border border-white/20 bg-black/50">
+
+                                    <img
+                                        :src="beforePreview"
+                                        class="w-full h-full object-cover rounded-xl overflow-hidden"
+                                        alt="before preview">
+
+                                    <button
+                                        type="button"
+                                        @click.stop="
+                                            beforePreview = null;
+                                            if ($refs.beforeInput) {
+                                                $refs.beforeInput.value = '';
+                                            }
+                                            $wire.set('before_image', null);
+                                        "
+                                        class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
+                                        <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
                                 </div>
-                                <span class="text-[10px] text-fuchsia-300/80 font-bold uppercase tracking-widest">Click to replace</span>
+
+                                <span class="text-[10px] text-fuchsia-300/80 font-bold uppercase tracking-widest">
+                                    Click to replace
+                                </span>
+
                             </div>
                         </template>
 
-                        {{-- Edit mode: show existing image (only when no new file selected) --}}
+                        {{-- EXISTING IMAGE --}}
                         <template x-if="!beforePreview">
-                            @if($editMode && $currentPortfolio?->before_image)
-                            <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                    <!-- <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->before_image) }}" class="w-full h-full object-cover" alt="current before"> -->
+                            @if($editMode && $currentPortfolio?->before_image && !$remove_before_image)
+
+                            <div class="relative flex flex-col items-center gap-2">
+
+                                <div class="relative w-24 h-24 rounded-xl overflow-visible border border-white/20 bg-black/50">
+
                                     <img
                                         src="{{ asset('storage/'.$currentPortfolio->before_image) }}"
-                                        class="w-full h-full object-cover"
+                                        class="w-full h-full object-cover rounded-xl overflow-hidden"
                                         alt="current before">
+
+                                    {{-- REMOVE EXISTING IMAGE --}}
+                                    <button
+                                        type="button"
+                                        @click.stop="$wire.removeBeforeImage()"
+                                        class="absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_10px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
+                                        <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
                                 </div>
-                                <span class="text-[10px] text-slate-400">Current Before</span>
-                                <span class="text-[10px] text-fuchsia-300/80 font-bold uppercase tracking-widest">Click to replace</span>
+
+                                <span class="text-[10px] text-slate-400">
+                                    Current Before
+                                </span>
+
+                                <span class="text-[10px] text-fuchsia-300/80 font-bold uppercase tracking-widest">
+                                    Click to replace
+                                </span>
+
                             </div>
+
                             @else
+
+                            {{-- EMPTY STATE --}}
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-white/10 flex items-center justify-center">
                                     <svg class="w-6 h-6 text-fuchsia-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
                                     </svg>
                                 </div>
-                                <p class="text-xs font-semibold text-slate-200"><span class="text-fuchsia-300">Before</span> image</p>
-                                <p class="text-[10px] text-slate-500">PNG, JPG, WEBP · 4MB max</p>
-                            </div>
-                            @endif
 
+                                <p class="text-xs font-semibold text-slate-200">
+                                    <span class="text-fuchsia-300">Before</span> image
+                                </p>
+
+                                <p class="text-[10px] text-slate-500">
+                                    PNG, JPG, WEBP · 4MB max
+                                </p>
+
+                            </div>
+
+                            @endif
                         </template>
 
                     </div>
-                    @if($editMode && $currentPortfolio?->before_image)
-                    <div class="mt-3">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" wire:model.live="remove_before_image">
-                            <span class="text-xs text-red-400">
-                                Remove Before Image
-                            </span>
-                        </label>
-                    </div>
-                    @endif
                     <div wire:loading wire:target="before_image" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
                         <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -192,17 +253,24 @@
                         @dragover.prevent="isDraggingAfter = true"
                         @dragleave.prevent="isDraggingAfter = false"
                         @drop.prevent="
-                            isDraggingAfter = false;
-                            const file = $event.dataTransfer.files[0];
-                            if (file) {
-                                const dt = new DataTransfer();
-                                dt.items.add(file);
-                                $refs.afterInput.files = dt.files;
-                                $refs.afterInput.dispatchEvent(new Event('change', { bubbles: true }));
-                                readFile(file, 'afterPreview');
-                            }
-                        "
-                        :class="isDraggingAfter ? 'border-cyan-500/80 bg-cyan-500/[0.06] scale-[1.01]' : 'border-white/15 hover:border-cyan-500/50 hover:bg-white/[0.02]'"
+        isDraggingAfter = false;
+        const file = $event.dataTransfer.files[0];
+
+        if (file) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+
+            $refs.afterInput.files = dt.files;
+            $refs.afterInput.dispatchEvent(
+                new Event('change', { bubbles: true })
+            );
+
+            readFile(file, 'afterPreview');
+        }
+    "
+                        :class="isDraggingAfter
+        ? 'border-cyan-500/80 bg-cyan-500/[0.06] scale-[1.01]'
+        : 'border-white/15 hover:border-cyan-500/50 hover:bg-white/[0.02]'"
                         class="relative flex flex-col items-center justify-center text-center bg-black/40 border-2 border-dashed rounded-2xl px-4 py-8 transition-all duration-300 shadow-inner shadow-black/40 cursor-pointer group min-h-[180px]">
 
                         <input
@@ -213,40 +281,94 @@
                             @change="readFile($event.target.files[0], 'afterPreview')"
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
 
-                        {{-- Alpine preview (new file selected) --}}
+                        {{-- NEW IMAGE --}}
                         <template x-if="afterPreview">
-                            <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                    <img :src="afterPreview" class="w-full h-full object-cover" alt="after preview">
+                            <div class="relative flex flex-col items-center gap-2">
+
+                                <div class="relative w-24 h-24 rounded-xl overflow-visible border border-white/20 bg-black/50">
+
+                                    <img
+                                        :src="afterPreview"
+                                        class="w-full h-full object-cover rounded-xl overflow-hidden"
+                                        alt="after preview">
+
+                                    <button
+                                        type="button"
+                                        @click.stop="
+                                            afterPreview = null;
+                                            $refs.afterInput.value = '';
+                                            $wire.removeAfterImage();
+                                        "
+                                        class="absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_10px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
+                                        <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
                                 </div>
-                                <span class="text-[10px] text-cyan-300/80 font-bold uppercase tracking-widest">Click to replace</span>
+
+                                <span class="text-[10px] text-cyan-300/80 font-bold uppercase tracking-widest">
+                                    Click to replace
+                                </span>
+
                             </div>
                         </template>
 
-                        {{-- Edit mode: show existing image (only when no new file selected) --}}
+                        {{-- EXISTING IMAGE --}}
                         <template x-if="!afterPreview">
-                            @if($editMode && $currentPortfolio?->after_image)
-                            <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                <div class="w-24 h-24 rounded-xl overflow-hidden border border-white/20 bg-black/50">
-                                    <!-- <img src="{{ asset('storage/'.\App\Models\Portfolio::find($portfolioId)->after_image) }}" class="w-full h-full object-cover" alt="current after"> -->
+                            @if($editMode && $currentPortfolio?->after_image && !$remove_after_image)
+
+                            <div class="relative flex flex-col items-center gap-2">
+
+                                <div class="relative w-24 h-24 rounded-xl overflow-visible border border-white/20 bg-black/50">
+
                                     <img
                                         src="{{ asset('storage/'.$currentPortfolio->after_image) }}"
-                                        class="w-full h-full object-cover"
+                                        class="w-full h-full object-cover rounded-xl overflow-hidden"
                                         alt="current after">
+
+                                    <button
+                                        type="button"
+                                        @click.stop="$wire.removeAfterImage()"
+                                        class="absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_10px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
+                                        <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
                                 </div>
-                                <span class="text-[10px] text-slate-400">Current After</span>
-                                <span class="text-[10px] text-cyan-300/80 font-bold uppercase tracking-widest">Click to replace</span>
+
+                                <span class="text-[10px] text-slate-400">
+                                    Current After
+                                </span>
+
+                                <span class="text-[10px] text-cyan-300/80 font-bold uppercase tracking-widest">
+                                    Click to replace
+                                </span>
+
                             </div>
+
                             @else
+
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center">
                                     <svg class="w-6 h-6 text-cyan-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
                                     </svg>
                                 </div>
-                                <p class="text-xs font-semibold text-slate-200"><span class="text-cyan-300">After</span> image</p>
-                                <p class="text-[10px] text-slate-500">PNG, JPG, WEBP · 4MB max</p>
+
+                                <p class="text-xs font-semibold text-slate-200">
+                                    <span class="text-cyan-300">After</span> image
+                                </p>
+
+                                <p class="text-[10px] text-slate-500">
+                                    PNG, JPG, WEBP · 4MB max
+                                </p>
+
                             </div>
+
                             @endif
                         </template>
 
@@ -294,20 +416,23 @@
         </div>
     </div>
 
-    {{-- BULK UPLOAD SECTION --}}
+    {{-- BULK UPLOAD SECTION
+         Uploads go through a temporary staging property (bulk_before_batch /
+         bulk_after_batch) which Livewire's updatedBulkBeforeBatch() /
+         updatedBulkAfterBatch() hooks merge into the persistent
+         bulk_before_images / bulk_after_images arrays server-side. This
+         means every selection — first or fifth — is simply appended, and
+         previews are rendered straight from Livewire's temporaryUrl(), so
+         there's no JS file-state to keep in sync. --}}
     <div
-        x-data="{
-            bulkBeforePreviews: [],
-            bulkAfterPreviews: [],
-            readMultiple(files, target) {
-                this[target] = [];
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = e => { this[target].push(e.target.result); };
-                    reader.readAsDataURL(file);
-                });
-            }
-        }"
+        x-data="{}"
+        x-on:bulk-before-merged.window="if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = ''"
+        x-on:bulk-after-merged.window="if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = ''"
+        x-on:reset-bulk-previews.window="
+            if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = '';
+            if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = '';
+        "
+
         class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5">
 
         <div class="flex items-center gap-2">
@@ -330,7 +455,7 @@
             <div class="space-y-2">
                 <label class="text-[11px] font-bold text-violet-300/80 uppercase tracking-wider pl-1">Category</label>
                 <select wire:model="bulk_category_id"
-                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40">
+                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40 cursor-pointer">
                     <option value="" class="bg-zinc-900">— Select Category —</option>
                     @foreach($categories as $cat)
                     <option value="{{ $cat->id }}" class="bg-zinc-900">{{ $cat->name }}</option>
@@ -353,49 +478,58 @@
                     </label>
                     <div class="relative flex flex-col items-center justify-center text-center bg-black/40 border-2 border-dashed border-white/15 hover:border-fuchsia-500/50 rounded-2xl px-4 py-8 transition-all duration-300 cursor-pointer group min-h-[160px]">
                         <input type="file"
-                            wire:model="bulk_before_images"
+                            x-ref="bulkBeforeInput"
+                            wire:model="bulk_before_batch"
                             accept="image/*"
                             multiple
-                            @change="readMultiple($event.target.files, 'bulkBeforePreviews')"
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
 
-                        <template x-if="bulkBeforePreviews.length > 0">
-                            <div class="pointer-events-none space-y-2">
-                                <div class="flex flex-wrap justify-center gap-1.5">
-                                    <template x-for="(src, i) in bulkBeforePreviews.slice(0, 6)" :key="i">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20">
-                                            <img :src="src" class="w-full h-full object-cover">
-                                        </div>
-                                    </template>
-                                    <template x-if="bulkBeforePreviews.length > 6">
-                                        <div class="w-12 h-12 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-xs text-white font-bold">
-                                            +<span x-text="bulkBeforePreviews.length - 6"></span>
-                                        </div>
-                                    </template>
-                                </div>
-                                <p class="text-xs text-fuchsia-300 font-semibold"><span x-text="bulkBeforePreviews.length"></span> Before images ready</p>
-                                <span class="text-[10px] text-slate-400">Click to change</span>
-                            </div>
-                        </template>
+                        @if(count($bulk_before_images) > 0)
+                        <div class="space-y-2">
+                            <div class="flex flex-wrap justify-center gap-1.5">
+                                @foreach($bulk_before_images as $i => $file)
+                                <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
-                        <template x-if="bulkBeforePreviews.length === 0">
-                            <div class="pointer-events-none flex flex-col items-center gap-2">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
-                                    <svg class="w-6 h-6 text-fuchsia-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
-                                    </svg>
+                                    <img
+                                        src="{{ $file->temporaryUrl() }}"
+                                        class="w-full h-full object-cover rounded-lg">
+
+                                    {{-- REMOVE THIS IMAGE --}}
+                                    <button
+                                        type="button"
+                                        wire:click.stop="removeBulkBeforeImage({{ $i }})"
+                                        class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
+                                        <svg class="w-2.5 h-2.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
                                 </div>
-                                <p class="text-xs font-semibold text-slate-200"><span class="text-fuchsia-300">Click</span> to select multiple</p>
-                                <p class="text-[10px] text-slate-500">Before images — same order mein</p>
+                                @endforeach
                             </div>
-                        </template>
+                            <p class="text-xs text-fuchsia-300 font-semibold">{{ count($bulk_before_images) }} Before images ready</p>
+                            <span class="text-[10px] text-slate-400">Click to add more</span>
+                        </div>
+                        @else
+                        <div class="pointer-events-none flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                                <svg class="w-6 h-6 text-fuchsia-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
+                                </svg>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-200"><span class="text-fuchsia-300">Click</span> to select multiple</p>
+                            <p class="text-[10px] text-slate-500">Before images — same order mein</p>
+                        </div>
+                        @endif
                     </div>
-                    <div wire:loading wire:target="bulk_before_images" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
+                    <div wire:loading wire:target="bulk_before_batch" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
                         <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
                         Uploading...
                     </div>
+                    @error('bulk_before_batch') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
+                    @error('bulk_before_batch.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_before_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_before_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                 </div>
@@ -410,49 +544,57 @@
                     </label>
                     <div class="relative flex flex-col items-center justify-center text-center bg-black/40 border-2 border-dashed border-white/15 hover:border-cyan-500/50 rounded-2xl px-4 py-8 transition-all duration-300 cursor-pointer group min-h-[160px]">
                         <input type="file"
-                            wire:model="bulk_after_images"
+                            x-ref="bulkAfterInput"
+                            wire:model="bulk_after_batch"
                             accept="image/*"
                             multiple
-                            @change="readMultiple($event.target.files, 'bulkAfterPreviews')"
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
 
-                        <template x-if="bulkAfterPreviews.length > 0">
-                            <div class="pointer-events-none space-y-2">
-                                <div class="flex flex-wrap justify-center gap-1.5">
-                                    <template x-for="(src, i) in bulkAfterPreviews.slice(0, 6)" :key="i">
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20">
-                                            <img :src="src" class="w-full h-full object-cover">
-                                        </div>
-                                    </template>
-                                    <template x-if="bulkAfterPreviews.length > 6">
-                                        <div class="w-12 h-12 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-xs text-white font-bold">
-                                            +<span x-text="bulkAfterPreviews.length - 6"></span>
-                                        </div>
-                                    </template>
-                                </div>
-                                <p class="text-xs text-cyan-300 font-semibold"><span x-text="bulkAfterPreviews.length"></span> After images ready</p>
-                                <span class="text-[10px] text-slate-400">Click to change</span>
-                            </div>
-                        </template>
+                        @if(count($bulk_after_images) > 0)
+                        <div class="space-y-2">
+                            <div class="flex flex-wrap justify-center gap-1.5">
+                                @foreach($bulk_after_images as $i => $file)
+                                <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
-                        <template x-if="bulkAfterPreviews.length === 0">
-                            <div class="pointer-events-none flex flex-col items-center gap-2">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
-                                    <svg class="w-6 h-6 text-cyan-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
-                                    </svg>
+                                    <img
+                                        src="{{ $file->temporaryUrl() }}"
+                                        class="w-full h-full object-cover">
+
+                                    <button
+                                        type="button"
+                                        wire:click.stop="removeBulkAfterImage({{ $i }})"
+                                        class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
+                                        <svg class="w-2.5 h-2.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
                                 </div>
-                                <p class="text-xs font-semibold text-slate-200"><span class="text-cyan-300">Click</span> to select multiple</p>
-                                <p class="text-[10px] text-slate-500">After images — same order mein</p>
+                                @endforeach
                             </div>
-                        </template>
+                            <p class="text-xs text-cyan-300 font-semibold">{{ count($bulk_after_images) }} After images ready</p>
+                            <span class="text-[10px] text-slate-400">Click to add more</span>
+                        </div>
+                        @else
+                        <div class="pointer-events-none flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                                <svg class="w-6 h-6 text-cyan-300 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
+                                </svg>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-200"><span class="text-cyan-300">Click</span> to select multiple</p>
+                            <p class="text-[10px] text-slate-500">After images — same order mein</p>
+                        </div>
+                        @endif
                     </div>
-                    <div wire:loading wire:target="bulk_after_images" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
+                    <div wire:loading wire:target="bulk_after_batch" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
                         <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
                         Uploading...
                     </div>
+                    @error('bulk_after_batch') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
+                    @error('bulk_after_batch.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_after_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_after_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                 </div>
@@ -460,15 +602,13 @@
             </div>
 
             {{-- Count match warning --}}
-            {{-- @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) !== count($bulk_after_images)) --}}
             @if(count($bulk_before_images) > 0 && count($bulk_before_images) !== count($bulk_after_images))
             <div class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs font-semibold">
-                ⚠️ Before ({{ count($bulk_before_images) }}) aur After ({{ count($bulk_after_images) }}) images ki count match nahi karti!
+                ⚠️ The number of Before ({{ count($bulk_before_images) }}) and After ({{ count($bulk_after_images) }}) images does not match!
             </div>
             @endif
 
             {{-- Count match success --}}
-            {{-- @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) === count($bulk_after_images)) --}}
             @if(count($bulk_before_images) > 0 && count($bulk_after_images) > 0 && count($bulk_before_images) === count($bulk_after_images))
             <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs font-semibold">
                 ✓ {{ count($bulk_before_images) }} pairs ready to upload!
@@ -476,7 +616,6 @@
             @endif
 
             {{-- Save Bulk Button --}}
-            <!-- @click="bulkBeforePreviews = []; bulkAfterPreviews = [];" -->
             <button wire:click="saveBulk"
                 wire:loading.attr="disabled"
                 class="w-full h-[52px] bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:shadow-[0_8px_25px_-5px_rgba(16,185,129,0.5)] hover:brightness-110 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg active:scale-[0.97] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
@@ -531,7 +670,7 @@
                 type="button"
                 class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-500/40 text-white text-sm font-semibold backdrop-blur-xl cursor-pointer">
 
-                <span>{{ $perPage }} Items</span>
+                <span>{{ $perPage === 'all' ? 'All' : $perPage }} Items</span>
 
                 <svg class="w-4 h-4 text-violet-300">
                     <path fill="currentColor" d="M7 10l5 5 5-5z" />
@@ -544,15 +683,15 @@
                 x-transition
                 class="absolute z-50 mt-2 w-full rounded-xl bg-zinc-900/95 backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl">
 
-                @foreach([5,10,15,25,50] as $size)
+                @foreach([5,10,15,25,50,'all'] as $size)
                 <button
                     @click="open=false"
-                    wire:click="$set('perPage', {{ $size }})"
+                    wire:click="$set('perPage', '{{ $size }}')"
                     class="w-full text-left px-4 py-3 text-sm transition-all cursor-pointer
-                    {{ $perPage == $size
+                    {{ (string) $perPage === (string) $size
                         ? 'bg-fuchsia-500/20 text-fuchsia-300'
                         : 'text-slate-300 hover:bg-white/5' }}">
-                    {{ $size }} Items
+                    {{ $size === 'all' ? 'All Items' : $size . ' Items' }}
                 </button>
                 @endforeach
 
@@ -581,7 +720,7 @@
     <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
 
         @forelse($portfolios as $portfolio)
-        <div wire:key="portfolio-{{ $portfolio->id }}" class="group relative bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-xl hover:bg-white/[0.06] hover:border-violet-500/40 hover:shadow-2xl hover:shadow-violet-950/40 hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between overflow-hidden h-full">
+        <div wire:key="portfolio-{{ $portfolio->id }}-{{ $portfolio->updated_at?->timestamp }}" class="group relative bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-xl hover:bg-white/[0.06] hover:border-violet-500/40 hover:shadow-2xl hover:shadow-violet-950/40 hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between overflow-hidden h-full">
 
             <div class="absolute -inset-px bg-gradient-to-br from-violet-500/0 via-transparent to-fuchsia-500/0 group-hover:from-violet-500/15 group-hover:to-fuchsia-500/15 rounded-2xl transition-all duration-500 pointer-events-none"></div>
 
@@ -589,7 +728,8 @@
                 <div class="grid grid-cols-2 gap-1.5">
                     <div class="relative overflow-hidden rounded-xl h-32 bg-black/40 border border-white/5">
                         @if($portfolio->before_image)
-                        <img loading="lazy" src="{{ asset('storage/'.$portfolio->before_image) }}"
+                        <img loading="lazy"
+                            src="{{ asset('storage/'.$portfolio->before_image) }}?v={{ $portfolio->updated_at?->timestamp }}"
                             class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
                             alt="before">
                         @endif
@@ -597,7 +737,8 @@
                     </div>
                     <div class="relative overflow-hidden rounded-xl h-32 bg-black/40 border border-white/5">
                         @if($portfolio->after_image)
-                        <img loading="lazy" src="{{ asset('storage/'.$portfolio->after_image) }}"
+                        <img loading="lazy"
+                            src="{{ asset('storage/'.$portfolio->after_image) }}?v={{ $portfolio->updated_at?->timestamp }}"
                             class="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 ease-out"
                             alt="after">
                         @endif

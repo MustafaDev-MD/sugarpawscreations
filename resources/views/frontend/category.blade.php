@@ -281,24 +281,39 @@
                                 <div class="album-single-item">
 
                                     <!-- <div class="before-after-container"> -->
-                                        <!-- <img src="{{ asset('storage/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
+                                    <!-- <img src="{{ asset('storage/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
                                         <img src="{{ asset('storage/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
-                                        <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
+                                    <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
                                         <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
-                                        <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
+                                    <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
                                         <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img">
                                     </div> -->
 
                                     @if(!empty($portfolio->before_image))
 
                                     <div class="before-after-container">
-                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
-                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img">
+                                        <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img"> -->
+                                        <img
+                                            src="{{ route('protected.image', ['path' => $portfolio->before_image]) }}"
+                                            alt="Before"
+                                            class="asi-img"
+                                            draggable="false">
+                                        <!-- <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img"> -->
+                                        <img
+                                            src="{{ route('protected.image', ['path' => $portfolio->after_image]) }}"
+                                            alt="After"
+                                            class="asi-img"
+                                            draggable="false">
                                     </div>
 
                                     @else
 
-                                    <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img single-image">
+                                    <!-- <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img single-image"> -->
+                                    <img
+                                        src="{{ route('protected.image', ['path' => $portfolio->after_image]) }}"
+                                        alt="After"
+                                        class="asi-img single-image"
+                                        draggable="false">
 
                                     @endif
 
@@ -314,10 +329,12 @@
                                     <!-- data-before="{{ asset('storage/'.$portfolio->before_image) }}"
                                     data-after="{{ asset('storage/'.$portfolio->after_image) }}" -->
                                     <!-- data-before="{{ url('/img/'.$portfolio->before_image) }}" -->
+                                    <!-- data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
+                                    data-after="{{ url('/img/'.$portfolio->after_image) }}" -->
                                     <a class="view-icon ba-trigger"
                                         href="javascript:void(0)"
-                                        data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
-                                        data-after="{{ url('/img/'.$portfolio->after_image) }}"
+                                        data-before="{{ $portfolio->before_image ? route('protected.image', ['path' => $portfolio->before_image]) : '' }}"
+                                        data-after="{{ route('protected.image', ['path' => $portfolio->after_image]) }}"
                                         data-index="{{ $baIndex }}"
                                         onclick="openBeforeAfterModal(this); return false;">
                                         <i class="fas fa-eye"></i>
@@ -495,5 +512,128 @@
         });
     });
     console.log(typeof $.fn.twentytwenty);
+</script>
+
+<style>
+    /* Prevent image selection and dragging */
+    .album-single-item img,
+    .before-after-container img,
+    .ali-img,
+    .an-item {
+        -webkit-user-drag: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .album-single-item img {
+        pointer-events: none;
+    }
+
+    /* Keep the eye/view button clickable */
+    .album-single-item .view-icon {
+        pointer-events: auto;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Disable right click only on protected gallery area
+        document.querySelectorAll(
+            '#gallery, .album-single-item, .before-after-container'
+        ).forEach(function(element) {
+
+            element.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+
+            element.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+        });
+
+        // Prevent common image-saving shortcuts inside gallery
+        document.addEventListener('keydown', function(e) {
+
+            if (
+                e.ctrlKey && ['s', 'u'].includes(e.key.toLowerCase())
+            ) {
+                e.preventDefault();
+            }
+
+            // Print Screen can't reliably be blocked,
+            // but we can remove selection.
+        });
+
+        // Prevent dragging images
+        document.querySelectorAll('#gallery img').forEach(function(img) {
+            img.setAttribute('draggable', 'false');
+
+            img.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+        });
+
+    });
+</script>
+<style>
+    /* Protect portfolio images from normal drag/select */
+    #gallery img,
+    .before-after-container img,
+    .album-single-item img {
+        -webkit-user-drag: none;
+        user-drag: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+    }
+
+    #gallery img {
+        pointer-events: none;
+    }
+
+    /* Eye button must remain clickable */
+    #gallery .view-icon {
+        pointer-events: auto;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const gallery = document.getElementById('gallery');
+
+    if (!gallery) return;
+
+    // Disable right click inside gallery
+    gallery.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+
+    // Disable drag
+    gallery.addEventListener('dragstart', function (e) {
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+        }
+    });
+
+    // Disable text/image selection
+    gallery.addEventListener('selectstart', function (e) {
+        e.preventDefault();
+    });
+
+    // Prevent common save/view-source shortcuts while inside gallery
+    document.addEventListener('keydown', function (e) {
+
+        if (
+            e.ctrlKey &&
+            ['s', 'u'].includes(e.key.toLowerCase())
+        ) {
+            e.preventDefault();
+        }
+
+    });
+
+});
 </script>
 @endsection

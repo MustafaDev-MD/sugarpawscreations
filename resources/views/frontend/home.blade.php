@@ -225,4 +225,31 @@
 </section>
 <!-- End content section -->
 
+<style>
+    .ali-img,
+.an-item,
+#gallery img {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.ali-img, .an-item').forEach(function (element) {
+
+        element.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        element.addEventListener('dragstart', function (e) {
+            e.preventDefault();
+        });
+
+    });
+
+});
+</script>
+
 @endsection

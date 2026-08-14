@@ -98,9 +98,16 @@ class CategoryController extends Controller
         // Pagination links me per_page query string lock rakhne ke liye
         $portfolios->appends(['per_page' => $perPage]);
 
+        // $baItems = $portfolios->getCollection()->map(fn($p) => [
+        //     'before' => asset('storage/' . $p->before_image),
+        //     'after'  => asset('storage/' . $p->after_image),
+        // ])->values();
+
         $baItems = $portfolios->getCollection()->map(fn($p) => [
-            'before' => asset('storage/' . $p->before_image),
-            'after'  => asset('storage/' . $p->after_image),
+            'before' => $p->before_image
+                ? route('protected.image', ['path' => $p->before_image])
+                : '',
+            'after' => route('protected.image', ['path' => $p->after_image]),
         ])->values();
 
         $nextCategory = Category::where('id', '>', $category->id)->orderBy('id', 'asc')->first() ?: Category::orderBy('id', 'asc')->first();
