@@ -131,7 +131,7 @@
   <!-- Theme master JS -->
   <script src="{{ asset('assets/js/jquery.event.move.js') }}"></script>
   <script src="{{ asset('assets/js/jquery.twentytwenty.js') }}"></script>
-  <script src="{{ asset('assets/js/theme.js') }}"></script>
+  <script src="{{ asset('assets/js/theme.js') }}?v={{ filemtime(public_path('assets/js/theme.js')) }}"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
