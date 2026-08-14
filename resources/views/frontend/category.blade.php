@@ -292,28 +292,13 @@
                                     @if(!empty($portfolio->before_image))
 
                                     <div class="before-after-container">
-                                        <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img"> -->
-                                        <img
-                                            src="{{ route('protected.image', ['path' => $portfolio->before_image]) }}"
-                                            alt="Before"
-                                            class="asi-img"
-                                            draggable="false">
-                                        <!-- <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img"> -->
-                                        <img
-                                            src="{{ route('protected.image', ['path' => $portfolio->after_image]) }}"
-                                            alt="After"
-                                            class="asi-img"
-                                            draggable="false">
+                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
+                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img">
                                     </div>
 
                                     @else
 
-                                    <!-- <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img single-image"> -->
-                                    <img
-                                        src="{{ route('protected.image', ['path' => $portfolio->after_image]) }}"
-                                        alt="After"
-                                        class="asi-img single-image"
-                                        draggable="false">
+                                    <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img single-image">
 
                                     @endif
 
@@ -329,12 +314,10 @@
                                     <!-- data-before="{{ asset('storage/'.$portfolio->before_image) }}"
                                     data-after="{{ asset('storage/'.$portfolio->after_image) }}" -->
                                     <!-- data-before="{{ url('/img/'.$portfolio->before_image) }}" -->
-                                    <!-- data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
-                                    data-after="{{ url('/img/'.$portfolio->after_image) }}" -->
                                     <a class="view-icon ba-trigger"
                                         href="javascript:void(0)"
-                                        data-before="{{ $portfolio->before_image ? route('protected.image', ['path' => $portfolio->before_image]) : '' }}"
-                                        data-after="{{ route('protected.image', ['path' => $portfolio->after_image]) }}"
+                                        data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
+                                        data-after="{{ url('/img/'.$portfolio->after_image) }}"
                                         data-index="{{ $baIndex }}"
                                         onclick="openBeforeAfterModal(this); return false;">
                                         <i class="fas fa-eye"></i>
