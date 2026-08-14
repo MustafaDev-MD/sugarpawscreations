@@ -1037,7 +1037,7 @@ section {
 	font-weight: 400;
 	color: #333;
 }
-.cd-navigation li > a {
+.cd-navigation li > a,.cd-navigation li {
 	display: block;
 	padding: 5px 30px 5px 30px;
 	text-transform: uppercase;
@@ -1045,7 +1045,7 @@ section {
 	font-weight: 400;
 	color: #333;
 }
-.cd-navigation li > a:hover, .cd-navigation li > a.active {
+.cd-navigation li > a:hover, .cd-navigation li > a.active{
 	background-color: rgba(111, 111, 111, 0.1);
 	color: #000;
 }
@@ -1155,7 +1155,7 @@ textarea.form-control {
 }
 #cd-lateral-nav.cd-lateral-dark .menu-header,
 #cd-lateral-nav.cd-lateral-dark .cd-menu-heading,
-#cd-lateral-nav.cd-lateral-dark .cd-navigation li > a {
+#cd-lateral-nav.cd-lateral-dark .cd-navigation li > a,#cd-lateral-nav.cd-lateral-dark .cd-navigation li {
 	color: #999;
 }
 #cd-lateral-nav.cd-lateral-dark .cd-navigation li > a:hover {

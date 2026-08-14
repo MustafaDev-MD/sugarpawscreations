@@ -142,7 +142,7 @@
 				===================== -->
         <ul class="cd-navigation">
 
-            <li><a class="link" href="page-about-us.html">About Us</a></li>
+            <li>About Us</li>
 
             <!-- Begin submenu -->
             <li class="item-has-children">
