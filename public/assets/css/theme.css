@@ -514,7 +514,8 @@ section {
 }
 .navbar-default .navbar-nav > li > a:focus, 
 .navbar-default .navbar-nav > li > a:hover {
-	color: #000;
+	/* color: #000; */
+	color: #9F3BFF;
 	background-color: transparent;
 }
 .navbar-default .navbar-nav > .active > a, 
@@ -917,7 +918,8 @@ section {
 	width: 20px;
 	height: 3px;
 	/* background-color: #000; */
-	background-color: #161921;
+	/* background-color: #161921; */
+	background-color: #9F3BFF;
 	border-radius: 5px;
 }
 #cd-menu-trigger .cd-menu-icon::before, #cd-menu-trigger .cd-menu-icon:after {
@@ -1794,7 +1796,8 @@ textarea.form-control {
 	color: #333;
 }
 .album-bottom-nav .abn-item a:hover {
-	color: #000;
+	/* color: #000; */
+	color: #9F3BFF;
 }
 
 .album-bottom-nav .abn-item.prev-album {
@@ -1808,22 +1811,25 @@ textarea.form-control {
 
 /* album bottom nav icon */
 .album-bottom-nav .abn-item .abn-icon {
-	font-size: 19px;
+	font-size: 15px;
 }
 
 /* album bottom nav text */
 .album-bottom-nav .abn-item .abn-text {
 	position: relative;
-	top: -7px;
+	/* top: -7px; */
+	top: -1px;
 	text-transform: uppercase;
-	font-size: 13px;
+	font-size: 15px;
 	font-weight: 400;
 	padding-bottom: 4px;
 	border-bottom: 2px solid #333;
 }
 .album-bottom-nav .abn-item.prev-album .abn-text {
+	right: 8px;
 }
 .album-bottom-nav .abn-item.next-album .abn-text {
+	right: -8px;
 }
 
 
@@ -3953,7 +3959,10 @@ a.al-at-link .al-at-text {
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 18px;
+	color: #9F3BFF;
 }
+
+
 @media (max-width : 992px) {
 	.pagination-info {
 		margin-top: 30px;
@@ -6008,13 +6017,11 @@ label {
 	border: 2px solid #000;
 }
 .scrolltotop:hover, .scrolltotop:focus {
-	background-color: #000;
-	color: #FFF;
+	/* background-color: #000;
+	color: #FFF; */
+	border-color: #9F3BFF;
+	color: #9F3BFF;
 }
-
-
-
-
 
 .before-after-container{
     width:100%;

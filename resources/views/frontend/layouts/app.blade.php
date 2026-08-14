@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Favicon (http://www.favicon-generator.org/) -->
-  <link rel="shortcut icon" href="{{ asset('assets/img/logo-dark.png') }}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ asset('assets/img/sugarpaws-creations-favicon.png') }}" type="image/x-icon">
   <!-- <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon"> -->
 
   <!-- Google font (https://www.google.com/fonts) -->

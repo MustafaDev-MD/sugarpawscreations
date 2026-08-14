@@ -59,7 +59,8 @@ a:hover {
 .navbar-default .navbar-nav>.open>a,
 .navbar-default .navbar-nav>.open>a:focus,
 .navbar-default .navbar-nav>.open>a:hover {
-	color: #FFF;
+	/* color: #FFF; */
+	color: #9F3BFF;
 }
 
 /* Navbar border bottom */
@@ -119,7 +120,8 @@ a:hover {
 #cd-menu-trigger .cd-menu-icon,
 #cd-menu-trigger.is-clicked .cd-menu-icon::before,
 #cd-menu-trigger.is-clicked .cd-menu-icon::after {
-	background-color: #CCC;
+	/* background-color: #CCC; */
+	background-color: #9F3BFF;
 }
 
 #cd-lateral-nav {
@@ -666,7 +668,8 @@ hr.hr-short {
 }
 
 .album-bottom-nav .abn-item a:hover {
-	color: #FFF;
+	/* color: #FFF; */
+	color: #9F3BFF;
 }
 
 /* Pagination */
@@ -679,7 +682,8 @@ hr.hr-short {
 }
 
 .twentytwenty-handle{
-	border: 3px solid #161921;
+	/* border: 3px solid #161921; */
+	border: 3px solid #9F3BFF;
 }
 
 .twentytwenty-horizontal .twentytwenty-handle:before, .twentytwenty-horizontal .twentytwenty-handle:after, .twentytwenty-vertical .twentytwenty-handle:before, .twentytwenty-vertical .twentytwenty-handle:after{
@@ -687,23 +691,31 @@ hr.hr-short {
 }
 
 .twentytwenty-left-arrow{
-	border-right: 6px solid #161921;
+	/* border-right: 6px solid #161921; */
+	border-right: 6px solid #9F3BFF;
 }
 
 .twentytwenty-right-arrow{
-	border-left: 6px solid #161921;
+	/* border-left: 6px solid #161921; */
+	border-left: 6px solid #9F3BFF;
 }
 
 .twentytwenty-horizontal .twentytwenty-handle:after {
-    -webkit-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    /* -webkit-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
     -moz-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
-    box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important; */
+	-webkit-box-shadow: 0 -3px 0 #9F3BFF, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    -moz-box-shadow: 0 -3px 0 #9F3BFF, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    box-shadow: 0 -3px 0 #9F3BFF, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
 }
 
 .twentytwenty-horizontal .twentytwenty-handle:before {
-    -webkit-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    /* -webkit-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
     -moz-box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
-    box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    box-shadow: 0 -3px 0 #161921, 0px 0px 12px rgba(51, 51, 51, 0.5) !important; */
+	-webkit-box-shadow: 0 -3px 0 #9F3BFF, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    -moz-box-shadow: 0 -3px 0 #9F3BFF, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
+    box-shadow: 0 -3px 0 #9F3BFF, 0px 0px 12px rgba(51, 51, 51, 0.5) !important;
 }
 
 .pagination>li>a:focus,
@@ -917,8 +929,10 @@ hr.hr-short {
 
 .scrolltotop:hover,
 .scrolltotop:focus {
-	color: #FFF;
-	border-color: #FFF;
+	/* color: #FFF;
+	border-color: #FFF; */
+	color: #9F3BFF;
+	border-color: #9F3BFF;
 }
 
 /* Other */

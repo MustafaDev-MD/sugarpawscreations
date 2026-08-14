@@ -10,13 +10,13 @@
         <!-- Begin logo -->
         <div id="logo">
             <a href="{{ route('home') }}" class="logo-dark">
-                <!-- <img src="{{ asset('assets/img/logo-dark.png') }}" alt="logo"> -->
-                Sugarpaws Creations
+                <img src="{{ asset('assets/img/sugarpaws-creations-logo.png') }}" alt="logo">
+                <!-- Sugarpaws Creations -->
             </a>
 
             <a href="{{ route('home') }}" class="logo-light">
-                <!-- <img src="{{ asset('assets/img/logo-light.png') }}" alt="logo"> -->
-                Sugarpaws Creations
+                <img src="{{ asset('assets/img/sugarpaws-creations-logo.png') }}" alt="logo">
+                <!-- Sugarpaws Creations -->
             </a>
         </div>
         <!-- End logo -->
