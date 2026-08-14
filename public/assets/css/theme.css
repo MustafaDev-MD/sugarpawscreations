@@ -257,7 +257,7 @@ address {
  *  Page preloader (display loading animation while page loads)
 /* ------------------------------------------------------------- */
 
-#preloader {
+/* #preloader {
 	position: fixed;
 	left: 0px;
 	top: 0px;
@@ -280,6 +280,9 @@ address {
 	-webkit-animation: scaleout 1.0s infinite ease;
 	animation: scaleout 1.0s infinite ease;
 }
+
+
+
 @-webkit-keyframes scaleout {
 	0% { -webkit-transform: scale(0.0) }
 	100% {
@@ -296,6 +299,422 @@ address {
 		-webkit-transform: scale(1.0);
 		opacity: 0;
 	}
+} */
+
+#preloader {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.loader-container {
+    position: relative;
+
+    width: 190px;
+    height: 190px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ==========================================
+   AMBIENT GLOW
+========================================== */
+
+.loader-glow {
+    position: absolute;
+
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    background: #9F3BFF;
+
+    opacity: 0.12;
+
+    filter: blur(30px);
+
+    animation: ambientGlow 2.5s ease-in-out infinite;
+}
+
+
+/* ==========================================
+   OUTER RIPPLE
+========================================== */
+
+.pulse-ring {
+    position: absolute;
+
+    width: 80px;
+    height: 80px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(159, 59, 255, 0.35);
+
+    opacity: 0;
+
+    transform: scale(0.5);
+
+    animation: ripple 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.pulse-ring-1 {
+    animation-delay: 0s;
+}
+
+.pulse-ring-2 {
+    animation-delay: 1s;
+}
+
+.pulse-ring-3 {
+    animation-delay: 2s;
+}
+
+
+/* ==========================================
+   MAIN ROTATING ORBIT
+========================================== */
+
+.rotating-ring {
+    position: absolute;
+
+    width: 118px;
+    height: 118px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(159, 59, 255, 0.10);
+
+    border-top-color: #9F3BFF;
+    border-right-color: rgba(159, 59, 255, 0.5);
+
+    animation: orbitRotate 1.8s linear infinite;
+
+    z-index: 5;
+}
+
+
+/* ==========================================
+   SECOND ORBIT
+========================================== */
+
+.rotating-ring::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 8px;
+
+    border-radius: 50%;
+
+    border: 1px dashed rgba(159, 59, 255, 0.20);
+
+    animation: reverseRotate 4s linear infinite;
+}
+
+
+/* ==========================================
+   ORBIT DOTS
+========================================== */
+
+.ring-dot {
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #9F3BFF;
+
+    box-shadow:
+        0 0 6px #9F3BFF,
+        0 0 14px rgba(159, 59, 255, 0.8);
+
+    z-index: 10;
+}
+
+.dot-1 {
+    top: -5px;
+    left: 50%;
+
+    transform: translateX(-50%);
+}
+
+.dot-2 {
+    right: 4px;
+    bottom: 22px;
+}
+
+.dot-3 {
+    left: 4px;
+    bottom: 22px;
+}
+
+
+/* ==========================================
+   LOGO CONTAINER
+========================================== */
+
+.loader-logo {
+    position: relative;
+
+    width: 76px;
+    height: 76px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 20;
+
+    box-shadow:
+        0 0 0 1px rgba(159, 59, 255, 0.08),
+        0 5px 15px rgba(159, 59, 255, 0.12),
+        0 15px 40px rgba(159, 59, 255, 0.16);
+
+    animation:
+        logoFloat 2.8s ease-in-out infinite,
+        logoShadow 2.8s ease-in-out infinite;
+}
+
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.loader-logo img {
+    width: 50px;
+    height: 50px;
+
+    object-fit: contain;
+
+    animation: logoBreath 2.8s ease-in-out infinite;
+}
+
+
+/* ==========================================
+   LOGO INNER GLOW
+========================================== */
+
+.loader-logo::before {
+    content: "";
+
+    position: absolute;
+
+    inset: -5px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(159, 59, 255, 0.15);
+
+    animation: innerPulse 2s ease-in-out infinite;
+}
+
+
+/* ==========================================
+   SMALL ORBITING PARTICLE
+========================================== */
+
+.loader-container::before {
+    content: "";
+
+    position: absolute;
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #9F3BFF;
+
+    box-shadow:
+        0 0 8px #9F3BFF,
+        0 0 18px rgba(159, 59, 255, 0.7);
+
+    animation: particleOrbit 3s linear infinite;
+
+    z-index: 30;
+}
+
+.loader-container::after {
+    content: "";
+
+    position: absolute;
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: #9F3BFF;
+
+    box-shadow:
+        0 0 7px #9F3BFF;
+
+    animation: particleOrbitReverse 4s linear infinite;
+
+    z-index: 30;
+}
+
+
+/* ==========================================
+   ANIMATIONS
+========================================== */
+
+@keyframes orbitRotate {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+@keyframes reverseRotate {
+
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+
+@keyframes ripple {
+
+    0% {
+        transform: scale(0.55);
+        opacity: 0.45;
+    }
+
+    70% {
+        opacity: 0.08;
+    }
+
+    100% {
+        transform: scale(2.1);
+        opacity: 0;
+    }
+}
+
+
+@keyframes ambientGlow {
+
+    0%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.08;
+    }
+
+    50% {
+        transform: scale(1.25);
+        opacity: 0.18;
+    }
+}
+
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-5px) scale(1.025);
+    }
+}
+
+
+@keyframes logoBreath {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
+}
+
+
+@keyframes logoShadow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 1px rgba(159, 59, 255, 0.08),
+            0 5px 15px rgba(159, 59, 255, 0.12),
+            0 15px 40px rgba(159, 59, 255, 0.16);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(159, 59, 255, 0.12),
+            0 8px 20px rgba(159, 59, 255, 0.16),
+            0 20px 50px rgba(159, 59, 255, 0.22);
+    }
+}
+
+
+@keyframes innerPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.12);
+        opacity: 0.8;
+    }
+}
+
+
+@keyframes particleOrbit {
+
+    from {
+        transform: rotate(0deg) translateX(72px) rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg) translateX(72px) rotate(-360deg);
+    }
+}
+
+
+@keyframes particleOrbitReverse {
+
+    from {
+        transform: rotate(360deg) translateX(82px) rotate(-360deg);
+    }
+
+    to {
+        transform: rotate(0deg) translateX(82px) rotate(0deg);
+    }
 }
 
 

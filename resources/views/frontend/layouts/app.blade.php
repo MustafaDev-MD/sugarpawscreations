@@ -60,8 +60,33 @@
 <body id="body">
 
   <!-- Begin page preloader -->
+  <!-- <div id="preloader">
+    <div class="pulse bg-main">
+      <img src="{{ asset('assets/img/sugarpaws-creations-favicon.png') }}" alt="loader image">
+    </div>
+  </div> -->
   <div id="preloader">
-    <div class="pulse bg-main"></div>
+    <div class="loader-container">
+
+      <div class="loader-glow"></div>
+
+      <div class="pulse-ring pulse-ring-1"></div>
+      <div class="pulse-ring pulse-ring-2"></div>
+      <div class="pulse-ring pulse-ring-3"></div>
+
+      <div class="rotating-ring">
+        <span class="ring-dot dot-1"></span>
+        <span class="ring-dot dot-2"></span>
+        <span class="ring-dot dot-3"></span>
+      </div>
+
+      <div class="loader-logo">
+        <img
+          src="{{ asset('assets/img/sugarpaws-creations-favicon.png') }}"
+          alt="SugarPaws Creations">
+      </div>
+
+    </div>
   </div>
   <!-- End page preloader -->
 
@@ -134,7 +159,7 @@
   <script src="{{ asset('assets/js/theme.js') }}?v={{ filemtime(public_path('assets/js/theme.js')) }}"></script>
 
   @php
-    $darkCssVersion = filemtime(public_path('assets/css/dark-style.css'));
+  $darkCssVersion = filemtime(public_path('assets/css/dark-style.css'));
   @endphp
 
   <script>
