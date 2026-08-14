@@ -417,8 +417,8 @@
     </div>
 
     {{-- BULK UPLOAD SECTION
-         Uploads go through a temporary staging property (bulk_before_batch /
-         bulk_after_batch) which Livewire's updatedBulkBeforeBatch() /
+         Uploads go through a temporary staging property (bulk_before_images /
+         bulk_after_images) which Livewire's updatedBulkBeforeBatch() /
          updatedBulkAfterBatch() hooks merge into the persistent
          bulk_before_images / bulk_after_images arrays server-side. This
          means every selection — first or fifth — is simply appended, and
@@ -426,12 +426,6 @@
          there's no JS file-state to keep in sync. --}}
     <div
         x-data="{}"
-        x-on:bulk-before-merged.window="if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = ''"
-        x-on:bulk-after-merged.window="if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = ''"
-        x-on:reset-bulk-previews.window="
-            if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = '';
-            if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = '';
-        "
 
         class="relative z-10 p-6 sm:p-8 bg-white/[0.04] backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] space-y-6 w-full ring-1 ring-white/5">
 
@@ -479,7 +473,7 @@
                     <div class="relative flex flex-col items-center justify-center text-center bg-black/40 border-2 border-dashed border-white/15 hover:border-fuchsia-500/50 rounded-2xl px-4 py-8 transition-all duration-300 cursor-pointer group min-h-[160px]">
                         <input type="file"
                             x-ref="bulkBeforeInput"
-                            wire:model="bulk_before_batch"
+                            wire:model="bulk_before_images"
                             accept="image/*"
                             multiple
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
@@ -522,14 +516,14 @@
                         </div>
                         @endif
                     </div>
-                    <div wire:loading wire:target="bulk_before_batch" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
+                    <div wire:loading wire:target="bulk_before_images" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
                         <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
                         Uploading...
                     </div>
-                    @error('bulk_before_batch') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
-                    @error('bulk_before_batch.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
+                    @error('bulk_before_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
+                    @error('bulk_before_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_before_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_before_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                 </div>
@@ -545,7 +539,7 @@
                     <div class="relative flex flex-col items-center justify-center text-center bg-black/40 border-2 border-dashed border-white/15 hover:border-cyan-500/50 rounded-2xl px-4 py-8 transition-all duration-300 cursor-pointer group min-h-[160px]">
                         <input type="file"
                             x-ref="bulkAfterInput"
-                            wire:model="bulk_after_batch"
+                            wire:model="bulk_after_images"
                             accept="image/*"
                             multiple
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
@@ -587,14 +581,14 @@
                         </div>
                         @endif
                     </div>
-                    <div wire:loading wire:target="bulk_after_batch" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
+                    <div wire:loading wire:target="bulk_after_images" class="flex items-center gap-2 text-[11px] text-violet-300/80 pl-1">
                         <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
                         Uploading...
                     </div>
-                    @error('bulk_after_batch') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
-                    @error('bulk_after_batch.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
+                    @error('bulk_after_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
+                    @error('bulk_after_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_after_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_after_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                 </div>

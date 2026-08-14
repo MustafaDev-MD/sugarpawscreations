@@ -48,24 +48,6 @@ class Portfolios extends Component
      */
     public array $bulk_after_images = [];
 
-    /**
-     * Temporary staging property. Each time the user selects files in the
-     * "Before" bulk input, Livewire uploads them here first. The
-     * updatedBulkBeforeBatch() hook then merges them into
-     * $bulk_before_images and clears this property — so previously
-     * selected files are never lost when the user adds more.
-     *
-     * @var array<int, TemporaryUploadedFile>
-     */
-    public array $bulk_before_batch = [];
-
-    /**
-     * Same staging mechanism as $bulk_before_batch, for the "After" input.
-     *
-     * @var array<int, TemporaryUploadedFile>
-     */
-    public array $bulk_after_batch = [];
-
     public string $selectedCategory = 'all';
 
     /**
@@ -125,42 +107,9 @@ class Portfolios extends Component
             'bulk_category_id',
             'bulk_before_images',
             'bulk_after_images',
-            'bulk_before_batch',
-            'bulk_after_batch',
         ]);
 
         $this->resetErrorBag();
-    }
-
-    /**
-     * Fires automatically whenever Livewire finishes uploading files into
-     * $bulk_before_batch (i.e. whenever the user selects files in the
-     * "Before" bulk input). Merges the newly uploaded batch into the
-     * persistent $bulk_before_images array, then clears the batch and
-     * tells the browser to reset the file input so it's ready for the
-     * next selection.
-     */
-    public function updatedBulkBeforeBatch(): void
-    {
-        if (!empty($this->bulk_before_batch)) {
-            $this->bulk_before_images = array_merge($this->bulk_before_images, $this->bulk_before_batch);
-            $this->bulk_before_batch = [];
-        }
-
-        $this->dispatch('bulk-before-merged');
-    }
-
-    /**
-     * Same as updatedBulkBeforeBatch() but for the "After" bulk input.
-     */
-    public function updatedBulkAfterBatch(): void
-    {
-        if (!empty($this->bulk_after_batch)) {
-            $this->bulk_after_images = array_merge($this->bulk_after_images, $this->bulk_after_batch);
-            $this->bulk_after_batch = [];
-        }
-
-        $this->dispatch('bulk-after-merged');
     }
 
     public function save(): void
