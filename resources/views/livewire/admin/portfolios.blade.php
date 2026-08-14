@@ -425,10 +425,27 @@
          previews are rendered straight from Livewire's temporaryUrl(), so
          there's no JS file-state to keep in sync. --}}
     <div
-        x-data="{}"
+        x-data="{
+            bulkBeforePreviews: [],
+            bulkAfterPreviews: [],
+            readMultipleFiles(fileList, target) {
+                const promises = Array.from(fileList).map(file => {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                });
+                Promise.all(promises).then(results => {
+                    this[target] = this[target].concat(results);
+                });
+            }
+        }"
         x-on:bulk-before-merged.window="if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = ''"
         x-on:bulk-after-merged.window="if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = ''"
         x-on:reset-bulk-previews.window="
+            bulkBeforePreviews = [];
+            bulkAfterPreviews = [];
             if ($refs.bulkBeforeInput) $refs.bulkBeforeInput.value = '';
             if ($refs.bulkAfterInput) $refs.bulkAfterInput.value = '';
         "
@@ -480,6 +497,7 @@
                         <input type="file"
                             x-ref="bulkBeforeInput"
                             wire:model="bulk_before_images"
+                            @change="readMultipleFiles($event.target.files, 'bulkBeforePreviews')"
                             accept="image/*"
                             multiple
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
@@ -491,12 +509,13 @@
                                 <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
                                     <img
-                                        src="{{ $file->temporaryUrl() }}"
+                                        :src="bulkBeforePreviews[{{ $i }}]"
                                         class="w-full h-full object-cover rounded-lg">
 
                                     {{-- REMOVE THIS IMAGE --}}
                                     <button
                                         type="button"
+                                        @click="bulkBeforePreviews.splice({{ $i }}, 1)"
                                         wire:click.stop="removeBulkBeforeImage({{ $i }})"
                                         class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
                                         <svg class="w-2.5 h-2.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -546,6 +565,7 @@
                         <input type="file"
                             x-ref="bulkAfterInput"
                             wire:model="bulk_after_images"
+                            @change="readMultipleFiles($event.target.files, 'bulkAfterPreviews')"
                             accept="image/*"
                             multiple
                             class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20">
@@ -557,11 +577,12 @@
                                 <div class="relative w-12 h-12 rounded-lg overflow-visible border border-white/20">
 
                                     <img
-                                        src="{{ $file->temporaryUrl() }}"
+                                        :src="bulkAfterPreviews[{{ $i }}]"
                                         class="w-full h-full object-cover">
 
                                     <button
                                         type="button"
+                                        @click="bulkAfterPreviews.splice({{ $i }}, 1)"
                                         wire:click.stop="removeBulkAfterImage({{ $i }})"
                                         class="absolute -top-1.5 -right-1.5 z-30 w-5 h-5 rounded-full bg-[#4c0101bf] border-2 border-[#ff00008c] hover:bg-[#ff00008c] hover:border-[#ff00008c] text-[#ff0000] hover:text-white flex items-center justify-center shadow-[0_2px_8px_rgba(255,0,0,0.35)] transition-all duration-200 cursor-pointer">
                                         <svg class="w-2.5 h-2.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
