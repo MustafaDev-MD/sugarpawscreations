@@ -133,6 +133,10 @@
   <script src="{{ asset('assets/js/jquery.twentytwenty.js') }}"></script>
   <script src="{{ asset('assets/js/theme.js') }}?v={{ filemtime(public_path('assets/js/theme.js')) }}"></script>
 
+  @php
+    $darkCssVersion = filemtime(public_path('assets/css/dark-style.css'));
+  @endphp
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
 
@@ -166,7 +170,7 @@
             darkStyleLink = document.createElement('link');
             darkStyleLink.rel = 'stylesheet';
             darkStyleLink.id = 'dark-style-css';
-            darkStyleLink.href = '{{ asset("assets/css/dark-style.css") }}?v=999999';
+            darkStyleLink.href = '{{ asset("assets/css/dark-style.css") }}?v={{ $darkCssVersion }}';
             document.head.appendChild(darkStyleLink);
           }
 
