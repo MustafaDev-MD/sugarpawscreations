@@ -166,7 +166,7 @@
             darkStyleLink = document.createElement('link');
             darkStyleLink.rel = 'stylesheet';
             darkStyleLink.id = 'dark-style-css';
-            darkStyleLink.href = '{{ asset("assets/css/dark-style.css") }}';
+            darkStyleLink.href = '{{ asset("assets/css/dark-style.css") }}?v={{ filemtime(public_path("assets/css/dark-style.css")) }}';
             document.head.appendChild(darkStyleLink);
           }
 
