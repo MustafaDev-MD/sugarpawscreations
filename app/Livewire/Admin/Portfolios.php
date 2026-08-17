@@ -309,16 +309,16 @@ class Portfolios extends Component
             'title' => $this->title,
         ];
 
-        if (!$this->portfolioId) {
-            return;
-        }
+        // if (!$this->portfolioId) {
+        //     return;
+        // }
 
-        $portfolio = Portfolio::findOrFail($this->portfolioId);
+        // $portfolio = Portfolio::findOrFail($this->portfolioId);
 
-        $data = [
-            'category_id' => $this->category_id,
-            'title'       => $this->title,
-        ];
+        // $data = [
+        //     'category_id' => $this->category_id,
+        //     'title'       => $this->title,
+        // ];
 
         if ($this->remove_before_image) {
 
