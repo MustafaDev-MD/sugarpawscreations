@@ -10,6 +10,7 @@ use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Illuminate\Database\Eloquent\Collection;
 
 class Portfolios extends Component
 {
@@ -115,10 +116,13 @@ class Portfolios extends Component
         ];
     }
 
-    public function getSubcategoriesProperty()
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getSubcategoriesProperty(): Collection
     {
         if (!$this->category_id) {
-            return collect();
+            return new Collection();
         }
 
         return Category::query()
@@ -128,10 +132,13 @@ class Portfolios extends Component
             ->get();
     }
 
-    public function getBulkSubcategoriesProperty()
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getBulkSubcategoriesProperty(): Collection
     {
         if (!$this->bulk_category_id) {
-            return collect();
+            return new Collection();
         }
 
         return Category::query()

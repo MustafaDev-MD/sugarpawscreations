@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\View\View;
+use App\Models\Portfolio;
 
 class CategoryController extends Controller
 {
@@ -119,7 +120,7 @@ class CategoryController extends Controller
         |--------------------------------------------------------------------------
         */
         $baItems = $portfolios->getCollection()
-            ->map(fn($p) => [
+            ->map(fn(Portfolio $p): array => [
                 'before' => $p->before_image
                     ? url('/img/' . $p->before_image)
                     : '',

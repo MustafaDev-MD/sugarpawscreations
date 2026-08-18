@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Portfolio;
 use Illuminate\Support\Str;
 
 /**
@@ -30,7 +31,7 @@ class Category extends Model
     ];
 
     /**
-     * Parent category.
+     * @return BelongsTo<Category, $this>
      */
     public function parent(): BelongsTo
     {
@@ -38,7 +39,7 @@ class Category extends Model
     }
 
     /**
-     * Sub categories.
+     * @return HasMany<Category, $this>
      */
     public function children(): HasMany
     {
@@ -46,7 +47,7 @@ class Category extends Model
     }
 
     /**
-     * Portfolio items.
+     * @return HasMany<Portfolio, $this>
      */
     public function portfolios(): HasMany
     {
