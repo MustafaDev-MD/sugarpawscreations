@@ -270,67 +270,170 @@
 
                         </div> -->
 
-                        @php $baIndex = 0; @endphp
+                        @php
+                            $baIndex = 0;
+                            $subcategories = $category->children ?? collect();
+                        @endphp
 
-                        <div id="gallery" class="isotope-items-wrap hover-center hover-boxed">
-                            <div class="grid-sizer"></div>
 
-                            @foreach($portfolios as $portfolio)
+                        {{-- =====================================================
+                            MAIN CATEGORY PORTFOLIOS
+                            No heading here
+                            ===================================================== --}}
 
-                            <div class="isotope-item">
-                                <div class="album-single-item">
+                        {{-- MAIN CATEGORY IMAGES --}}
+@if($portfolios->isNotEmpty())
 
-                                    <!-- <div class="before-after-container"> -->
-                                    <!-- <img src="{{ asset('storage/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
-                                        <img src="{{ asset('storage/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
-                                    <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img" loading="lazy">
-                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img" loading="lazy"> -->
-                                    <!-- <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
-                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img">
-                                    </div> -->
+    <div id="gallery" class="isotope-items-wrap hover-center hover-boxed">
 
-                                    @if(!empty($portfolio->before_image))
+        <div class="grid-sizer"></div>
 
-                                    <div class="before-after-container">
-                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" alt="Before" class="asi-img">
-                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img">
-                                    </div>
+        @foreach($portfolios as $portfolio)
 
-                                    @else
+            {{-- Main category image card --}}
+            <div class="isotope-item">
+                <div class="album-single-item">
 
-                                    <img src="{{ url('/img/'.$portfolio->after_image) }}" alt="After" class="asi-img single-image">
-
-                                    @endif
-
-                                    <!-- <a class="view-icon ba-trigger"
-                                        href="#"
-                                        data-before="{{ asset('storage/'.$portfolio->before_image) }}"
-                                        data-after="{{ asset('storage/'.$portfolio->after_image) }}"
-                                        data-index="{{ $baIndex }}"
-                                        onclick="openBeforeAfterModal({{ $baIndex }}); return false;">
-                                        <i class="fas fa-eye"></i>
-                                    </a> -->
-
-                                    <!-- data-before="{{ asset('storage/'.$portfolio->before_image) }}"
-                                    data-after="{{ asset('storage/'.$portfolio->after_image) }}" -->
-                                    <!-- data-before="{{ url('/img/'.$portfolio->before_image) }}" -->
-                                    <a class="view-icon ba-trigger"
-                                        href="javascript:void(0)"
-                                        data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
-                                        data-after="{{ url('/img/'.$portfolio->after_image) }}"
-                                        data-index="{{ $baIndex }}"
-                                        onclick="openBeforeAfterModal(this); return false;">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    @php $baIndex++ @endphp
-
-                                </div>
-                            </div>
-
-                            @endforeach
-
+                    @if($portfolio->before_image)
+                        <div class="before-after-container">
+                            <img src="{{ url('/img/'.$portfolio->before_image) }}" class="asi-img" alt="Before">
+                            <img src="{{ url('/img/'.$portfolio->after_image) }}" class="asi-img" alt="After">
                         </div>
+                    @else
+                        <img
+                            src="{{ url('/img/'.$portfolio->after_image) }}"
+                            class="asi-img single-image"
+                            alt="After"
+                        >
+                    @endif
+
+                    <a
+                        class="view-icon ba-trigger"
+                        href="javascript:void(0)"
+                        data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
+                        data-after="{{ url('/img/'.$portfolio->after_image) }}"
+                        data-index="{{ $baIndex }}"
+                        onclick="openBeforeAfterModal(this); return false;"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </a>
+
+                    @php $baIndex++; @endphp
+
+                </div>
+            </div>
+
+        @endforeach
+
+    </div>
+
+@endif
+
+
+{{-- SUBCATEGORIES --}}
+@foreach($subcategories as $subCategory)
+
+    @php
+        $subPortfolios = $subCategory->portfolios ?? collect();
+    @endphp
+
+    @if($subPortfolios->isNotEmpty())
+
+        <div class="subcategory-section">
+
+            <h2 class="subcategory-title">
+                {{ $subCategory->name }}
+            </h2>
+
+            <div class="subcategory-gallery">
+
+                <div class="isotope-items-wrap hover-center hover-boxed">
+
+                    <div class="grid-sizer"></div>
+
+                    @foreach($subPortfolios as $portfolio)
+
+                        {{-- Subcategory image card --}}
+                        <div class="isotope-item">
+                            <div class="album-single-item">
+
+                                @if($portfolio->before_image)
+                                    <div class="before-after-container">
+                                        <img src="{{ url('/img/'.$portfolio->before_image) }}" class="asi-img" alt="Before">
+                                        <img src="{{ url('/img/'.$portfolio->after_image) }}" class="asi-img" alt="After">
+                                    </div>
+                                @else
+                                    <img
+                                        src="{{ url('/img/'.$portfolio->after_image) }}"
+                                        class="asi-img single-image"
+                                        alt="After"
+                                    >
+                                @endif
+
+                                <a
+                                    class="view-icon ba-trigger"
+                                    href="javascript:void(0)"
+                                    data-before="{{ $portfolio->before_image ? url('/img/'.$portfolio->before_image) : '' }}"
+                                    data-after="{{ url('/img/'.$portfolio->after_image) }}"
+                                    data-index="{{ $baIndex }}"
+                                    onclick="openBeforeAfterModal(this); return false;"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                @php $baIndex++; @endphp
+
+                            </div>
+                        </div>
+
+                    @endforeach
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endif
+
+@endforeach
+
+
+                        <style>
+                            /* =========================================
+                            Subcategory layout
+                            ========================================= */
+
+                            .subcategory-section {
+                                width: 100%;
+                                display: block;
+                                clear: both;
+                                padding-top: 30px;
+                            }
+
+                            .subcategory-section:first-child {
+                                margin-top: 0;
+                            }
+
+                            .subcategory-title {
+                                display: block;
+                                width: 100%;
+                                margin: 0 0 25px;
+                                clear: both;
+                            }
+
+                            .subcategory-gallery {
+                                width: 100%;
+                                display: block;
+                                clear: both;
+                            }
+
+                            .subcategory-gallery .isotope-items-wrap {
+                                width: 100%;
+                                display: block;
+                                clear: both;
+                            }
+                        </style>
 
                         <script>
                             var baItems = JSON.parse('{!! json_encode($baItems) !!}') || [];
@@ -582,41 +685,40 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
 
-    const gallery = document.getElementById('gallery');
+        const gallery = document.getElementById('gallery');
 
-    if (!gallery) return;
+        if (!gallery) return;
 
-    // Disable right click inside gallery
-    gallery.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-    });
-
-    // Disable drag
-    gallery.addEventListener('dragstart', function (e) {
-        if (e.target.tagName === 'IMG') {
+        // Disable right click inside gallery
+        gallery.addEventListener('contextmenu', function(e) {
             e.preventDefault();
-        }
-    });
+        });
 
-    // Disable text/image selection
-    gallery.addEventListener('selectstart', function (e) {
-        e.preventDefault();
-    });
+        // Disable drag
+        gallery.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
 
-    // Prevent common save/view-source shortcuts while inside gallery
-    document.addEventListener('keydown', function (e) {
-
-        if (
-            e.ctrlKey &&
-            ['s', 'u'].includes(e.key.toLowerCase())
-        ) {
+        // Disable text/image selection
+        gallery.addEventListener('selectstart', function(e) {
             e.preventDefault();
-        }
+        });
+
+        // Prevent common save/view-source shortcuts while inside gallery
+        document.addEventListener('keydown', function(e) {
+
+            if (
+                e.ctrlKey && ['s', 'u'].includes(e.key.toLowerCase())
+            ) {
+                e.preventDefault();
+            }
+
+        });
 
     });
-
-});
 </script>
 @endsection

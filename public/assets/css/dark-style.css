@@ -465,7 +465,8 @@ a.al-at-link:focus {
 /* Owl Carousel */
 .owl-carousel .owl-nav .owl-prev,
 .owl-carousel .owl-nav .owl-next {
-	background-color: rgba(0, 0, 0, 0.25);
+	/* background-color: rgba(0, 0, 0, 0.25); */
+	background-color: rgb(17 17 17 / 46%);
 	color: #FFF;
 }
 

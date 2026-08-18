@@ -85,27 +85,103 @@ class CategoryController extends Controller
 
     public function show(Category $category, Request $request): View
     {
-        // URL se value pakdein, default 12
         $perPage = $request->input('per_page', 12);
 
-        // Strict validation array
         if (!in_array($perPage, [4, 8, 12, 16])) {
             $perPage = 12;
         }
 
-        $portfolios = $category->portfolios()->paginate($perPage);
+        /*
+        |--------------------------------------------------------------------------
+        | Load subcategories
+        |--------------------------------------------------------------------------
+        */
+        $category->load([
+            'children' => function ($query) {
+                $query->orderBy('name');
+            },
+        ]);
 
-        // Pagination links me per_page query string lock rakhne ke liye
-        $portfolios->appends(['per_page' => $perPage]);
+        /*
+        |--------------------------------------------------------------------------
+        | Current category portfolios
+        |--------------------------------------------------------------------------
+        */
+        $portfolios = $category->portfolios()
+            ->whereNull('subcategory_id')
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
 
-        $baItems = $portfolios->getCollection()->map(fn($p) => [
-            'before' => asset('storage/' . $p->before_image),
-            'after'  => asset('storage/' . $p->after_image),
-        ])->values();
+        /*
+        |--------------------------------------------------------------------------
+        | Before / After items
+        |--------------------------------------------------------------------------
+        */
+        $baItems = $portfolios->getCollection()
+            ->map(fn($p) => [
+                'before' => $p->before_image
+                    ? url('/img/' . $p->before_image)
+                    : '',
+                'after' => $p->after_image
+                    ? url('/img/' . $p->after_image)
+                    : '',
+            ])
+            ->values();
 
-        $nextCategory = Category::where('id', '>', $category->id)->orderBy('id', 'asc')->first() ?: Category::orderBy('id', 'asc')->first();
-        $prevCategory = Category::where('id', '<', $category->id)->orderBy('id', 'desc')->first() ?: Category::orderBy('id', 'desc')->first();
+        /*
+        |--------------------------------------------------------------------------
+        | Load portfolios for every subcategory
+        |--------------------------------------------------------------------------
+        */
+        foreach ($category->children as $subCategory) {
+            $subCategory->setRelation(
+                'portfolios',
+                $category->portfolios()
+                    ->where('subcategory_id', $subCategory->id)
+                    ->latest()
+                    ->get()
+            );
+        }
 
-        return view('frontend.category', compact('category', 'portfolios', 'baItems', 'nextCategory', 'prevCategory'));
+        /*
+        |--------------------------------------------------------------------------
+        | Next / Previous MAIN Category
+        |--------------------------------------------------------------------------
+        |
+        | Only categories where parent_id = NULL are included.
+        | Subcategories will never appear in Prev / Next navigation.
+        |
+        */
+
+        $nextCategory = Category::whereNull('parent_id')
+            ->where('id', '>', $category->id)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        if (!$nextCategory) {
+            $nextCategory = Category::whereNull('parent_id')
+                ->orderBy('id', 'asc')
+                ->first();
+        }
+
+        $prevCategory = Category::whereNull('parent_id')
+            ->where('id', '<', $category->id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$prevCategory) {
+            $prevCategory = Category::whereNull('parent_id')
+                ->orderBy('id', 'desc')
+                ->first();
+        }
+
+        return view('frontend.category', compact(
+            'category',
+            'portfolios',
+            'baItems',
+            'nextCategory',
+            'prevCategory'
+        ));
     }
 }

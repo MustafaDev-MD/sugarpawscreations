@@ -89,15 +89,50 @@
             <div class="space-y-2 w-full flex flex-col">
                 <label class="text-[11px] font-bold text-violet-300/80 uppercase tracking-wider pl-1">Category</label>
                 <select
-                    wire:model="category_id"
+                    wire:model.live="category_id"
                     class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40 cursor-pointer">
                     <option value="" class="bg-zinc-900">— Select Category —</option>
-                    @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" class="bg-zinc-900">{{ $cat->name }}</option>
+                    @foreach($categories->whereNull('parent_id') as $cat)
+                    <option value="{{ $cat->id }}" class="bg-zinc-900">
+                        {{ $cat->name }}
+                    </option>
                     @endforeach
                 </select>
                 @error('category_id')
                 <span class="text-rose-400 text-xs pl-1">{{ $message }}</span>
+                @enderror
+            </div>
+
+            {{-- SUBCATEGORY --}}
+            <div class="space-y-2 w-full flex flex-col">
+                <label class="text-[11px] font-bold text-fuchsia-300/80 uppercase tracking-wider pl-1">
+                    Subcategory
+                    <span class="text-slate-500 normal-case tracking-normal">(Optional)</span>
+                </label>
+
+                <select
+                    wire:model.live="subcategory_id"
+                    @disabled(!$category_id)
+                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+
+                    <option value="" class="bg-zinc-900">
+                        {{ $category_id ? '— Select Subcategory —' : '— Select Category First —' }}
+                    </option>
+
+                    @foreach($this->subcategories as $subcategory)
+                    <option
+                        value="{{ $subcategory->id }}"
+                        class="bg-zinc-900">
+                        {{ $subcategory->name }}
+                    </option>
+                    @endforeach
+
+                </select>
+
+                @error('subcategory_id')
+                <span class="text-rose-400 text-xs pl-1">
+                    {{ $message }}
+                </span>
                 @enderror
             </div>
 
@@ -473,15 +508,48 @@
             {{-- BULK CATEGORY --}}
             <div class="space-y-2">
                 <label class="text-[11px] font-bold text-violet-300/80 uppercase tracking-wider pl-1">Category</label>
-                <select wire:model="bulk_category_id"
+                <select wire:model.live="bulk_category_id"
                     class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40 cursor-pointer">
                     <option value="" class="bg-zinc-900">— Select Category —</option>
-                    @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" class="bg-zinc-900">{{ $cat->name }}</option>
+                    @foreach($categories->whereNull('parent_id') as $cat)
+                    <option value="{{ $cat->id }}" class="bg-zinc-900">
+                        {{ $cat->name }}
+                    </option>
                     @endforeach
                 </select>
                 @error('bulk_category_id')
                 <span class="text-rose-400 text-xs pl-1">{{ $message }}</span>
+                @enderror
+            </div>
+
+            {{-- BULK SUBCATEGORY --}}
+            <div class="space-y-2">
+                <label class="text-[11px] font-bold text-fuchsia-300/80 uppercase tracking-wider pl-1">
+                    Subcategory
+                    <span class="text-slate-500 normal-case tracking-normal">(Optional)</span>
+                </label>
+
+                <select
+                    wire:model.live="bulk_subcategory_id"
+                    @disabled(!$bulk_category_id)
+                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+
+                    <option value="" class="bg-zinc-900">
+                        {{ $bulk_category_id ? '— Select Subcategory —' : '— Select Category First —' }}
+                    </option>
+
+                    @foreach($this->bulkSubcategories as $subcategory)
+                    <option value="{{ $subcategory->id }}" class="bg-zinc-900">
+                        {{ $subcategory->name }}
+                    </option>
+                    @endforeach
+
+                </select>
+
+                @error('bulk_subcategory_id')
+                <span class="text-rose-400 text-xs pl-1">
+                    {{ $message }}
+                </span>
                 @enderror
             </div>
 
@@ -550,8 +618,6 @@
                     </div>
                     @error('bulk_before_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_before_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
-                    @error('bulk_before_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
-                    @error('bulk_before_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                 </div>
 
                 {{-- BULK AFTER IMAGES --}}
@@ -579,7 +645,7 @@
 
                                     <img
                                         :src="bulkAfterPreviews[{{ $i }}]"
-                                        class="w-full h-full object-cover">
+                                        class="w-full h-full object-cover rounded-lg">
 
                                     <button
                                         type="button"
@@ -614,8 +680,6 @@
                         </svg>
                         Uploading...
                     </div>
-                    @error('bulk_after_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
-                    @error('bulk_after_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_after_images') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                     @error('bulk_after_images.*') <span class="text-rose-400 text-xs pl-1">{{ $message }}</span> @enderror
                 </div>
@@ -771,7 +835,17 @@
                     {{ $portfolio->title ?: '—' }}
                 </h2>
                 <p class="text-[10px] text-slate-500 px-1 truncate">
-                    {{ $portfolio->category->name ?? '—' }}
+                    <span class="text-slate-400">
+                        {{ $portfolio->category->name ?? '—' }}
+                    </span>
+
+                    @if($portfolio->subcategory)
+                    <span class="text-slate-600 mx-1">/</span>
+
+                    <span class="text-fuchsia-300/80">
+                        {{ $portfolio->subcategory->name }}
+                    </span>
+                    @endif
                 </p>
             </div>
 
@@ -837,24 +911,38 @@
 
     <script>
         document.addEventListener('livewire:init', () => {
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,
                 positionClass: 'toast-top-right',
-                timeOut: 3000,
+                timeOut: 4000,
                 newestOnTop: true,
                 preventDuplicates: true,
             };
 
             Livewire.on('success', (event) => {
-                const message = Array.isArray(event) ? event[0]?.message : event?.message;
-                toastr.success(message ?? 'Success');
+
+                const data = Array.isArray(event) ?
+                    event[0] :
+                    event;
+
+                toastr.success(
+                    data?.message ?? 'Success'
+                );
             });
 
             Livewire.on('error', (event) => {
-                const message = Array.isArray(event) ? event[0]?.message : event?.message;
-                toastr.error(message ?? 'Something went wrong');
+
+                const data = Array.isArray(event) ?
+                    event[0] :
+                    event;
+
+                toastr.error(
+                    data?.message ?? 'Something went wrong'
+                );
             });
+
         });
     </script>
 

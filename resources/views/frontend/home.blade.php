@@ -172,7 +172,7 @@
             data-mobile-landscape="1"
             data-mobile-portrait="1">
 
-            @foreach($categories as $category)
+            @foreach($categories->whereNull('parent_id') as $category)
 
             <div class="album-list-item">
 

@@ -27,7 +27,9 @@ class Portfolios extends Component
 
     // Single upload
     public string $title = '';
+
     public ?int $category_id = null;
+    public ?int $subcategory_id = null;
 
     public ?TemporaryUploadedFile $before_image = null;
     public ?TemporaryUploadedFile $after_image = null;
@@ -37,6 +39,7 @@ class Portfolios extends Component
 
     // Bulk upload
     public ?int $bulk_category_id = null;
+    public ?int $bulk_subcategory_id = null;
 
     /**
      * @var array<int, TemporaryUploadedFile>
@@ -50,6 +53,13 @@ class Portfolios extends Component
 
     public string $selectedCategory = 'all';
 
+    private function showValidationErrors(\Illuminate\Validation\ValidationException $e): void
+    {
+        foreach ($e->validator->errors()->all() as $message) {
+            $this->dispatch('error', message: $message);
+        }
+    }
+
     /**
      * Rules for the single create/update form.
      *
@@ -62,18 +72,83 @@ class Portfolios extends Component
 
             'category_id' => 'required|exists:categories,id',
 
-            'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'subcategory_id' => [
+                'nullable',
+                'exists:categories,id',
+                function ($attribute, $value, $fail) {
+                    if (!$value || !$this->category_id) {
+                        return;
+                    }
+
+                    $exists = Category::where('id', $value)
+                        ->where('parent_id', $this->category_id)
+                        ->exists();
+
+                    if (!$exists) {
+                        $fail('The selected subcategory does not belong to the selected category.');
+                    }
+                },
+            ],
+
+            // 'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif,mp4|max:102400',
+            'before_image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:102400',
+
+            // 'after_image' => $this->editMode
+            //     ? [
+            //         'required_without:currentPortfolio.after_image',
+            //         'nullable',
+            //         'image',
+            //         'mimes:jpg,jpeg,png,webp,gif,mp4',
+            //         'max:102400',
+            //     ]
+            //     : 'required|image|mimes:jpg,jpeg,png,webp,gif,mp4|max:102400',
 
             'after_image' => $this->editMode
                 ? [
                     'required_without:currentPortfolio.after_image',
                     'nullable',
-                    'image',
-                    'mimes:jpg,jpeg,png,webp',
-                    'max:4096',
+                    'file',
+                    'mimes:jpg,jpeg,png,webp,gif',
+                    'max:102400',
                 ]
-                : 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+                : 'required|file|mimes:jpg,jpeg,png,webp,gif|max:102400',
         ];
+    }
+
+    public function getSubcategoriesProperty()
+    {
+        if (!$this->category_id) {
+            return collect();
+        }
+
+        return Category::query()
+            ->where('parent_id', $this->category_id)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function getBulkSubcategoriesProperty()
+    {
+        if (!$this->bulk_category_id) {
+            return collect();
+        }
+
+        return Category::query()
+            ->where('parent_id', $this->bulk_category_id)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function updatedCategoryId(): void
+    {
+        $this->subcategory_id = null;
+    }
+
+    public function updatedBulkCategoryId(): void
+    {
+        $this->bulk_subcategory_id = null;
     }
 
     private function generateFilename(TemporaryUploadedFile $file): string
@@ -89,6 +164,7 @@ class Portfolios extends Component
         $this->reset([
             'title',
             'category_id',
+            'subcategory_id',
             'before_image',
             'after_image',
             'portfolioId',
@@ -105,6 +181,7 @@ class Portfolios extends Component
     {
         $this->reset([
             'bulk_category_id',
+            'bulk_subcategory_id',
             'bulk_before_images',
             'bulk_after_images',
         ]);
@@ -114,32 +191,43 @@ class Portfolios extends Component
 
     public function save(): void
     {
-        $this->validate($this->singleRules());
+        try {
+            $this->validate($this->singleRules());
 
-        $category = Category::findOrFail($this->category_id);
+            $category = Category::findOrFail($this->category_id);
 
-        Portfolio::create([
-            'category_id'  => $this->category_id,
-            'title'        => $this->title,
-            'before_image' => $category->has_before_image && $this->before_image
-                ? $this->before_image->storeAs(
-                    'portfolios',
-                    $this->generateFilename($this->before_image),
-                    'public'
-                )
-                : null,
-            'after_image'  => $this->after_image
-                ? $this->after_image->storeAs('portfolios', $this->generateFilename($this->after_image), 'public')
-                : null,
-        ]);
+            Portfolio::create([
+                'category_id' => $this->category_id,
+                'subcategory_id' => $this->subcategory_id,
+                'title' => $this->title,
+                'before_image' => $category->has_before_image && $this->before_image
+                    ? $this->before_image->storeAs(
+                        'portfolios',
+                        $this->generateFilename($this->before_image),
+                        'public'
+                    )
+                    : null,
+                'after_image' => $this->after_image
+                    ? $this->after_image->storeAs(
+                        'portfolios',
+                        $this->generateFilename($this->after_image),
+                        'public'
+                    )
+                    : null,
+            ]);
 
-        $this->resetInput();
+            $this->resetInput();
 
-        $this->dispatch('$refresh');
+            $this->dispatch('$refresh');
+            $this->dispatch('reset-previews');
 
-        $this->dispatch('reset-previews');
+            $this->dispatch('success', message: 'Portfolio Added Successfully');
+        } catch (\Illuminate\Validation\ValidationException $e) {
 
-        $this->dispatch('success', message: 'Portfolio Added Successfully');
+            $this->showValidationErrors($e);
+
+            throw $e;
+        }
     }
 
     public function removeBulkBeforeImage(int $index): void
@@ -164,62 +252,105 @@ class Portfolios extends Component
 
     public function saveBulk(): void
     {
-        // 1. Initial validation for the category ID
-        $this->validate([
-            'bulk_category_id' => 'required|exists:categories,id',
-        ]);
+        try {
 
-        $category = Category::findOrFail($this->bulk_category_id);
+            $this->validate([
+                'bulk_category_id' => 'required|exists:categories,id',
+                'bulk_subcategory_id' => [
+                    'nullable',
+                    'exists:categories,id',
+                    function ($attribute, $value, $fail) {
+                        if (!$value || !$this->bulk_category_id) {
+                            return;
+                        }
 
-        // 2. Base rules: After images are always required for a portfolio entry
-        $rules = [
-            'bulk_after_images'   => 'required|array|min:1',
-            'bulk_after_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-        ];
+                        $exists = Category::where('id', $value)
+                            ->where('parent_id', $this->bulk_category_id)
+                            ->exists();
 
-        // 3. Conditional strict validation rules only if before images are present
-        if ($category->has_before_image && !empty($this->bulk_before_images)) {
-            $rules['bulk_before_images']   = 'required|array|min:1';
-            $rules['bulk_before_images.*'] = 'image|mimes:jpg,jpeg,png,webp|max:4096';
+                        if (!$exists) {
+                            $fail('The selected subcategory does not belong to the selected category.');
+                        }
+                    },
+                ],
+            ]);
+
+            $category = Category::findOrFail($this->bulk_category_id);
+
+            $rules = [
+                'bulk_after_images' => 'required|array|min:1|max:20',
+                'bulk_after_images.*' => 'file|mimes:jpg,jpeg,png,webp,gif|max:102400',
+            ];
+
+            if ($category->has_before_image && !empty($this->bulk_before_images)) {
+                $rules['bulk_before_images'] = 'required|array|min:1|max:20';
+                $rules['bulk_before_images.*'] =
+                    'file|mimes:jpg,jpeg,png,webp,gif|max:102400';
+            }
+
+            $this->validate($rules);
+
+            if ($category->has_before_image && !empty($this->bulk_before_images)) {
+
+                if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
+                    $this->dispatch(
+                        'error',
+                        message: 'Before/After images count must match.'
+                    );
+
+                    return;
+                }
+
+                foreach ($this->bulk_before_images as $i => $before) {
+                    $after = $this->bulk_after_images[$i];
+
+                    Portfolio::create([
+                        'category_id' => $this->bulk_category_id,
+                        'subcategory_id' => $this->bulk_subcategory_id,
+                        'title' => '',
+                        'before_image' => $before->storeAs(
+                            'portfolios',
+                            $this->generateFilename($before),
+                            'public'
+                        ),
+                        'after_image' => $after->storeAs(
+                            'portfolios',
+                            $this->generateFilename($after),
+                            'public'
+                        ),
+                    ]);
+                }
+            } else {
+
+                foreach ($this->bulk_after_images as $after) {
+                    Portfolio::create([
+                        'category_id' => $this->bulk_category_id,
+                        'subcategory_id' => $this->bulk_subcategory_id,
+                        'title' => '',
+                        'before_image' => null,
+                        'after_image' => $after->storeAs(
+                            'portfolios',
+                            $this->generateFilename($after),
+                            'public'
+                        ),
+                    ]);
+                }
+            }
+
+            $this->resetBulk();
+
+            $this->dispatch('reset-bulk-previews');
+
+            $this->dispatch(
+                'success',
+                message: 'Bulk portfolios uploaded successfully'
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            $this->showValidationErrors($e);
+
+            throw $e;
         }
-
-        $this->validate($rules);
-
-        // 4. If before images are uploaded, enforce a strict matching count pair
-        if ($category->has_before_image && !empty($this->bulk_before_images)) {
-            if (count($this->bulk_before_images) !== count($this->bulk_after_images)) {
-                $this->dispatch('error', message: 'Before/After images count must match');
-                return;
-            }
-
-            // Loop through pairs safely since counts match
-            foreach ($this->bulk_before_images as $i => $before) {
-                $after = $this->bulk_after_images[$i];
-
-                Portfolio::create([
-                    'category_id'  => $this->bulk_category_id,
-                    'title'        => '',
-                    'before_image' => $before->storeAs('portfolios', $this->generateFilename($before), 'public'),
-                    'after_image'  => $after->storeAs('portfolios', $this->generateFilename($after), 'public'),
-                ]);
-            }
-        } else {
-            // 5. If no before images were uploaded (or category doesn't support them), just save after images
-            foreach ($this->bulk_after_images as $after) {
-                Portfolio::create([
-                    'category_id'  => $this->bulk_category_id,
-                    'title'        => '',
-                    'before_image' => null,
-                    'after_image'  => $after->storeAs('portfolios', $this->generateFilename($after), 'public'),
-                ]);
-            }
-        }
-
-        $this->resetBulk();
-
-        $this->dispatch('reset-bulk-previews');
-
-        $this->dispatch('success', message: 'Bulk portfolios uploaded successfully');
     }
 
     public function edit(int $id): void
@@ -231,6 +362,7 @@ class Portfolios extends Component
         $this->portfolioId  = $portfolio->id;
         $this->title        = $portfolio->title;
         $this->category_id  = $portfolio->category_id;
+        $this->subcategory_id = $portfolio->subcategory_id;
 
         $this->before_image = null;
         $this->after_image  = null;
@@ -261,122 +393,130 @@ class Portfolios extends Component
 
     public function update(): void
     {
-        $this->validate([
-            'title' => 'nullable|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'after_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-        ]);
+        try {
+            $this->validate([
+                'title' => 'nullable|string|max:255',
+                'category_id' => 'required|exists:categories,id',
+                'before_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif,mp4|max:102400',
+                'after_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif,mp4|max:102400',
+            ]);
 
-        $category = Category::findOrFail($this->category_id);
+            $category = Category::findOrFail($this->category_id);
 
-        if (!$this->portfolioId) {
-            return;
-        }
-
-        $portfolio = Portfolio::findOrFail($this->portfolioId);
-
-        // After image must always exist after update.
-        // If existing image is removed, a new image must be uploaded.
-        if (
-            $this->remove_after_image &&
-            !($this->after_image instanceof TemporaryUploadedFile)
-        ) {
-            $this->addError(
-                'after_image',
-                'After image is required.'
-            );
-
-            return;
-        }
-
-        // If there is no existing After image and no new image,
-        // update must not continue.
-        if (
-            !$portfolio->after_image &&
-            !($this->after_image instanceof TemporaryUploadedFile)
-        ) {
-            $this->addError(
-                'after_image',
-                'After image is required.'
-            );
-
-            return;
-        }
-
-        $data = [
-            'category_id' => $this->category_id,
-            'title' => $this->title,
-        ];
-
-        // if (!$this->portfolioId) {
-        //     return;
-        // }
-
-        // $portfolio = Portfolio::findOrFail($this->portfolioId);
-
-        // $data = [
-        //     'category_id' => $this->category_id,
-        //     'title'       => $this->title,
-        // ];
-
-        if ($this->remove_before_image) {
-
-            if ($portfolio->before_image) {
-                Storage::disk('public')->delete($portfolio->before_image);
+            if (!$this->portfolioId) {
+                return;
             }
 
-            $data['before_image'] = null;
-        } elseif ($category->has_before_image) {
+            $portfolio = Portfolio::findOrFail($this->portfolioId);
 
-            if ($this->before_image instanceof TemporaryUploadedFile) {
+            // After image must always exist after update.
+            // If existing image is removed, a new image must be uploaded.
+            if (
+                $this->remove_after_image &&
+                !($this->after_image instanceof TemporaryUploadedFile)
+            ) {
+                $this->addError(
+                    'after_image',
+                    'After image is required.'
+                );
+
+                return;
+            }
+
+            // If there is no existing After image and no new image,
+            // update must not continue.
+            if (
+                !$portfolio->after_image &&
+                !($this->after_image instanceof TemporaryUploadedFile)
+            ) {
+                $this->addError(
+                    'after_image',
+                    'After image is required.'
+                );
+
+                return;
+            }
+
+            $data = [
+                'category_id' => $this->category_id,
+                'subcategory_id' => $this->subcategory_id,
+                'title' => $this->title,
+            ];
+
+            // if (!$this->portfolioId) {
+            //     return;
+            // }
+
+            // $portfolio = Portfolio::findOrFail($this->portfolioId);
+
+            // $data = [
+            //     'category_id' => $this->category_id,
+            //     'title'       => $this->title,
+            // ];
+
+            if ($this->remove_before_image) {
 
                 if ($portfolio->before_image) {
                     Storage::disk('public')->delete($portfolio->before_image);
                 }
 
-                $data['before_image'] = $this->before_image->storeAs(
+                $data['before_image'] = null;
+            } elseif ($category->has_before_image) {
+
+                if ($this->before_image instanceof TemporaryUploadedFile) {
+
+                    if ($portfolio->before_image) {
+                        Storage::disk('public')->delete($portfolio->before_image);
+                    }
+
+                    $data['before_image'] = $this->before_image->storeAs(
+                        'portfolios',
+                        $this->generateFilename($this->before_image),
+                        'public'
+                    );
+                }
+            } else {
+
+                if ($portfolio->before_image) {
+                    Storage::disk('public')->delete($portfolio->before_image);
+                }
+
+                $data['before_image'] = null;
+            }
+
+            if ($this->remove_after_image) {
+
+                if ($portfolio->after_image) {
+                    Storage::disk('public')->delete($portfolio->after_image);
+                }
+
+                $data['after_image'] = null;
+            } elseif ($this->after_image instanceof TemporaryUploadedFile) {
+
+                if ($portfolio->after_image) {
+                    Storage::disk('public')->delete($portfolio->after_image);
+                }
+
+                $data['after_image'] = $this->after_image->storeAs(
                     'portfolios',
-                    $this->generateFilename($this->before_image),
+                    $this->generateFilename($this->after_image),
                     'public'
                 );
             }
-        } else {
 
-            if ($portfolio->before_image) {
-                Storage::disk('public')->delete($portfolio->before_image);
-            }
+            $portfolio->update($data);
 
-            $data['before_image'] = null;
+            $this->resetInput();
+
+            $this->dispatch('reset-previews');
+
+            $this->dispatch('success', message: 'Portfolio Updated Successfully');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            $this->showValidationErrors($e);
+
+            throw $e;
         }
-
-        if ($this->remove_after_image) {
-
-            if ($portfolio->after_image) {
-                Storage::disk('public')->delete($portfolio->after_image);
-            }
-
-            $data['after_image'] = null;
-        } elseif ($this->after_image instanceof TemporaryUploadedFile) {
-
-            if ($portfolio->after_image) {
-                Storage::disk('public')->delete($portfolio->after_image);
-            }
-
-            $data['after_image'] = $this->after_image->storeAs(
-                'portfolios',
-                $this->generateFilename($this->after_image),
-                'public'
-            );
-        }
-
-        $portfolio->update($data);
-
-        $this->resetInput();
-
-        $this->dispatch('reset-previews');
-
-        $this->dispatch('success', message: 'Portfolio Updated Successfully');
     }
 
     public function delete(int $id): void
@@ -419,7 +559,10 @@ class Portfolios extends Component
     public function render(): View
     {
         $query = Portfolio::query()
-            ->with(['category:id,name,has_before_image'])
+            ->with([
+                'category:id,name,has_before_image',
+                'subcategory:id,name',
+            ])
             ->latest();
 
         if ($this->selectedCategory !== 'all') {
@@ -436,7 +579,9 @@ class Portfolios extends Component
 
         return view('livewire.admin.portfolios', [
             'portfolios' => $query->paginate($perPage),
-            'categories' => Category::select('id', 'name', 'has_before_image')
+            'categories' => Category::query()
+                ->whereNull('parent_id')
+                ->select('id', 'name', 'has_before_image')
                 ->latest()
                 ->get(),
         ]);

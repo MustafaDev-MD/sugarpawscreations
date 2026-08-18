@@ -346,6 +346,44 @@
 
             </div>
 
+            <!-- CATEGORY TYPE -->
+            <div class="space-y-2 w-full flex flex-col">
+
+                <label
+                    class="text-[11px] font-bold text-violet-300/80 uppercase tracking-wider pl-1">
+                    Category Type
+                </label>
+
+                <select
+                    wire:model.live="parentId"
+                    class="w-full bg-black/40 border border-white/15 focus:border-fuchsia-500/60 focus:ring-4 focus:ring-fuchsia-500/15 p-3 pl-4 text-sm rounded-xl text-white outline-none transition-all duration-300 h-[52px] shadow-inner shadow-black/40">
+
+                    <option value="" class="bg-zinc-900">
+                        Main Category
+                    </option>
+
+                    @foreach($mainCategories as $mainCategory)
+
+                    <option
+                        value="{{ $mainCategory->id }}"
+                        class="bg-zinc-900">
+
+                        ↳ {{ $mainCategory->name }}
+
+                    </option>
+
+                    @endforeach
+
+                </select>
+
+                @error('parent_id')
+                <span class="text-rose-400 text-xs pl-1">
+                    {{ $message }}
+                </span>
+                @enderror
+
+            </div>
+
 
             <!-- IMAGE UPLOAD -->
             <div class="space-y-2 w-full flex flex-col">
@@ -933,40 +971,40 @@
 
             @if($perPage === 'all')
 
-                Showing
-                <span class="text-fuchsia-300 font-semibold">
-                    {{ $categories->count() }}
-                </span>
+            Showing
+            <span class="text-fuchsia-300 font-semibold">
+                {{ $categories->count() }}
+            </span>
 
-                of
+            of
 
-                <span class="text-violet-300 font-semibold">
-                    {{ $categories->count() }}
-                </span>
+            <span class="text-violet-300 font-semibold">
+                {{ $categories->count() }}
+            </span>
 
-                categories
+            categories
 
             @else
 
-                Showing
+            Showing
 
-                <span class="text-fuchsia-300 font-semibold">
-                    {{ $categories->firstItem() ?? 0 }}
-                </span>
+            <span class="text-fuchsia-300 font-semibold">
+                {{ $categories->firstItem() ?? 0 }}
+            </span>
 
-                -
+            -
 
-                <span class="text-fuchsia-300 font-semibold">
-                    {{ $categories->lastItem() ?? 0 }}
-                </span>
+            <span class="text-fuchsia-300 font-semibold">
+                {{ $categories->lastItem() ?? 0 }}
+            </span>
 
-                of
+            of
 
-                <span class="text-violet-300 font-semibold">
-                    {{ $categories->total() }}
-                </span>
+            <span class="text-violet-300 font-semibold">
+                {{ $categories->total() }}
+            </span>
 
-                categories
+            categories
 
             @endif
 
@@ -999,9 +1037,30 @@
                     </div>
                     @endif
                 </div>
-                <h2 class="font-bold text-sm text-white tracking-wide group-hover:text-fuchsia-300 transition-colors duration-300 line-clamp-1 px-1">
-                    {{ $cat->name }}
-                </h2>
+                <div class="flex items-center justify-between gap-2 px-1">
+
+                    <h2 class="font-bold text-sm text-white tracking-wide group-hover:text-fuchsia-300 transition-colors duration-300 line-clamp-1">
+                        {{ $cat->name }}
+                    </h2>
+
+                    @if($cat->parent)
+                    <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-violet-300">
+                        Sub Category
+                    </span>
+                    @else
+                    <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-300">
+                        Main Category
+                    </span>
+                    @endif
+
+                </div>
+
+                @if($cat->parent)
+                <p class="text-[10px] text-violet-400/80 mt-1 px-1 truncate">
+                    Parent: {{ $cat->parent->name }}
+                </p>
+                @endif
+
                 <p class="text-[10px] text-slate-500 mt-1 px-1 truncate">
                     Slug: {{ $cat->slug }}
                 </p>

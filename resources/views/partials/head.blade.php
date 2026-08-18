@@ -7,7 +7,7 @@
 
 <!-- <link rel="icon" href="/favicon.ico" sizes="any"> -->
 <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml"> -->
-<link rel="shortcut icon" href="{{ asset('assets/img/logo-dark.png') }}" type="image/x-icon">
+<link rel="shortcut icon" href="{{ asset('assets/img/sugarpaws-creations-favicon.png') }}" type="image/x-icon">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
